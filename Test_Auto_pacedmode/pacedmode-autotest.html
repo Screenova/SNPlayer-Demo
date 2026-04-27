@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Pacing Mode Auto</title>
+    <style>
+    /*vous pouvez changer à tout moment ce style
+    *selon votre choix
+    */
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; padding: 20px; margin: 0; }
+        .grid-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; max-width: 1600px; margin: 0 auto; }
+        .panel { background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h3 { color: #00ff00; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        input, select { background: #2d2d2d; border: 1px solid #444; color: #fff; padding: 10px; width: 100%; box-sizing: border-box; margin: 10px 0; border-radius: 4px; }
+        .stats { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-card { background: #252525; padding: 10px; border-radius: 4px; text-align: center; border-bottom: 3px solid #00ff00; }
+        .val { font-size: 1.8em; font-weight: bold; display: block; color: #fff; }
+        
+        .btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        button { padding: 12px; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
+        .btn-start { background: #27ae60; color: white; }
+        .btn-stop { background: #f39c12; color: white; }
+        .btn-new { background: #3498db; color: white; }
+        .btn-reset { background: #c0392b; color: white; opacity: 0.7; }
+        button:hover { filter: brightness(1.2); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Styles Historique */
+        .history-container { margin-top: 20px; max-height: 150px; overflow-y: auto; background: #111; border-radius: 4px; border: 1px solid #333; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+        th { text-align: left; background: #333; padding: 8px; color: #00ff00; }
+        td { padding: 6px 10px; border-bottom: 1px solid #333; }
+        
+        .loading-bar-container { background: #333; height: 6px; border-radius: 3px; margin-top: 15px; overflow: hidden; }
+        .loading-bar { height: 100%; background: #00ff00; width: 0%; }
+        
+        /* Iframe au-dessus */
+        iframe { width: 100%; height: 500px; border: none; border-radius: 8px; background: white; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<div class="grid-layout">
+    <div class="panel">
+        <h3>Parametre Player du Demo</h3>
+        <label>Placement ID :</label>
+        <input type="text" id="targetId" placeholder="ID du placement">        
+        <label>Intervalle :</label>
+        <select id="intervalSelect">
+            <option value="20">20 secondes (Rapide)</option>
+            <option value="60">60 secondes (Normale)</option>
+        </select>        
+        <div class="stats">
+            <div class="stat-card"><span>Impression</span><span id="impCount" class="val">0 / 180</span></div>
+            <div class="stat-card"><span>Temps</span><span id="timer" class="val">00:00:00</span></div>
+        </div>
+        <div class="loading-bar-container">
+            <div id="pBar" class="loading-bar"></div>
+        </div>
+        <div class="btn-group">
+            <button id="startBtn" class="btn-start" onclick="startTest()">Démarrer</button>
+            <button id="stopBtn" class="btn-stop" onclick="stopTest('Arrêt manuel')" disabled>Arrêter & Sauver</button>
+            <button class="btn-new" onclick="prepareNew()">Nouvel ID</button>
+            <button class="btn-reset" onclick="clearAllData()">Reinitialiser</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Visualisation(demo)</h3>
+        <iframe id="adPreview" src="about:blank"></iframe>
+        <h3>Historiques</h3>
+        <div class="history-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date&Heure</th>
+                        <th>ID</th>
+                        <th>Imp.</th>
+                        <th>Durée</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+	//url direct qui cible directement le demo pour preprod
+	//on peut changer l'environnement de test selon le besoin(player demo ou prod)
+    const url_base = "https://admin-preprod.retailspotads.com/fr/demo?placement="; 
+    const NombreImpression = 180; //exemple
+    let state = {
+        running: localStorage.getItem('qa_running') === 'true',
+        id: localStorage.getItem('qa_id') || "",
+        count: parseInt(localStorage.getItem('qa_count')) || 0,
+        logicalTime: parseInt(localStorage.getItem('qa_logical_time')) || 0,
+        interval: parseInt(localStorage.getItem('qa_interval')) || 20
+    };
+    window.onload = () => {
+        loadHistory();
+        if (state.running) {
+            document.getElementById('targetId').value = state.id;
+            document.getElementById('intervalSelect').value = state.interval;
+            lockControls(true);
+            resumeLoop();
+        }
+    };
+    function startTest() {
+        const id = document.getElementById('targetId').value.trim();
+        if (!id) return alert("ID manquant");
+        state.running = true;
+        state.id = id;
+        state.count = 0;
+        state.logicalTime = 0;
+        state.interval = parseInt(document.getElementById('intervalSelect').value);
+        saveState();
+        location.reload();
+    }
+    function resumeLoop() {
+        updateUI();
+        runCycle();
+    }
+    function runCycle() {
+        if (!state.running) return;
+        if (state.count >= NombreImpression) {
+            stopTest("Objectif 180 atteint !");
+            return;
+        }
+        // Chargement URL réelle
+        document.getElementById('adPreview').src = `${url_base}${state.id}&cb=${Date.now()}`;
+        
+        state.count++;
+        state.logicalTime += state.interval;
+        
+        saveState();
+        updateUI();
+
+        const bar = document.getElementById('pBar');
+        bar.style.transition = 'none'; bar.style.width = '0%';
+        setTimeout(() => { 
+            bar.style.transition = `width ${state.interval}s linear`; 
+            bar.style.width = '100%'; 
+        }, 50);
+
+        setTimeout(runCycle, state.interval * 1000);
+    }
+    function updateUI() {
+        document.getElementById('impCount').innerText = `${state.count} / ${NombreImpression}`;
+        const h = Math.floor(state.logicalTime / 3600).toString().padStart(2, '0');
+        const m = Math.floor((state.logicalTime % 3600) / 60).toString().padStart(2, '0');
+        const s = (state.logicalTime % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+    }
+    function stopTest(msg) {
+        const history = JSON.parse(localStorage.getItem('qa_history') || "[]");
+        history.unshift({
+            date: new Date().toLocaleString(),
+            id: state.id,
+            count: state.count,
+            duration: document.getElementById('timer').innerText
+        });
+        localStorage.setItem('qa_history', JSON.stringify(history));
+        state.running = false;
+        saveState();
+        alert(msg);
+        location.reload();
+    }
+    function lockControls(lock) {
+        document.getElementById('targetId').disabled = lock;
+        document.getElementById('intervalSelect').disabled = lock;
+        document.getElementById('startBtn').disabled = lock;
+        document.getElementById('stopBtn').disabled = !lock;
+    }
+    function saveState() {
+        localStorage.setItem('qa_running', state.running);
+        localStorage.setItem('qa_id', state.id);
+        localStorage.setItem('qa_count', state.count);
+        localStorage.setItem('qa_logical_time', state.logicalTime);
+        localStorage.setItem('qa_interval', state.interval);
+    }
+    function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('qa_history') || "[]");
+        document.getElementById('historyBody').innerHTML = history.map(h => `
+            <tr><td>${h.date}</td><td>${h.id.substring(0,8)}..</td><td><b>${h.count}</b></td><td>${h.duration}</td></tr>
+        `).join('');
+    }
+
+    function prepareNew() {
+        if (state.running) return alert("Arrêtez le test");
+        localStorage.removeItem('qa_id');
+        localStorage.removeItem('qa_count');
+        localStorage.removeItem('qa_logical_time');
+        location.reload();
+    }
+
+    function clearAllData() {
+        if(confirm("Tout effacer ?")) { localStorage.clear(); location.reload(); }
+    }
+</script>
+</body>
+</html>

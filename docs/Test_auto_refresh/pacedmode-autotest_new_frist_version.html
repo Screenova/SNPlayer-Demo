@@ -289,10 +289,6 @@ in nisl nisi scelerisque. Proin sed libero enim sed faucibus turpis in eu.
 Diam donec adipiscing tristique risus nec feugiat in fermentum posuere. Tempor nec feugiat
 nisl pretium fusce. Mauris vitae ultricies leo integer malesuada nunc. Rhoncus mattis rhoncus
 urna neque viverra justo. Sit amet luctus venenatis lectus magna fringilla urna.`;
-
-// Para 3 : RS injecte la pub ICI (entre LOREM_TOP et LOREM_BTM) via positionSelector=".fake-text"
-// RS insère son conteneur après le dernier enfant trouvé au moment de l'init.
-// En séparant top/mid/btm on garantit du texte avant ET après la pub.
 const LOREM_MID = `Quam adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna. Diam
 sollicitudin tempor id eu nisl nunc mi. Nulla posuere sollicitudin aliquam ultrices sagittis.
 Arcu non odio euismod lacinia at quis risus. Sit amet tellus cras adipiscing enim eu turpis.`;
@@ -388,8 +384,6 @@ function buildIframeContent(placement, env, format) {
     text-align: justify;
   }
   .fake-text p { margin-bottom: 12px; }
-  /* Obs 5 : centrer le player intext dans le flux de texte */
-  /* RetailSpot insère un conteneur directement dans .fake-text */
   .fake-text > div[id],
   .fake-text > div[class*="rs-"],
   .fake-text > div[class*="retailspot"],
@@ -398,16 +392,10 @@ function buildIframeContent(placement, env, format) {
     justify-content: center !important;
     margin: 16px auto !important;
   }
-  /* v11.8 intext : rendre le wrapper scrollable pour que la pub reste
-     ancrée dans le texte pendant le scroll — le lecteur peut lire
-     le texte d'après sans déplacer la vidéo */
   .page-wrap {
     overflow-y: auto;
     max-height: 100vh;
   }
-  /* v11.8 slider : fake-text visible comme contexte éditorial,
-     mais la pub reste en position naturelle RS (pas d'injection dans le texte).
-     On bloque les interactions sur le texte pour ne pas perturber le player. */
   body.fmt-slider .fake-text {
     opacity: 0.55;
     pointer-events: none;
@@ -434,7 +422,6 @@ function buildIframeContent(placement, env, format) {
 </div>
 
 <script>
-  // v11.8 : appliquer la classe format sur <body> pour le CSS conditionnel
   document.body.classList.add('fmt-' + ${JSON.stringify(format)});
   var _placement  = ${JSON.stringify(placement)};
   var _format     = ${JSON.stringify(format)};
@@ -444,9 +431,7 @@ function buildIframeContent(placement, env, format) {
   var _creative         = null;   // creative courant (pour appeler stopAd())
   var _adPlaying        = false;  // true entre AdStarted et AdStopped
   var _attemptId        = null;   // attemptId du cycle courant
-  var _pendingAttemptId = null;   // v11.8 : attemptId en attente si init() reçu pendant adPlaying
-                                  // capturé en closure dans chaque handler → les événements
-                                  // d'un ancien creative (cycle N-1) sont ignorés silencieusement
+  var _pendingAttemptId = null;
 
   function postUp(type, data) {
     try { window.parent.postMessage({ rsEvent: type, data: data || {} }, '*'); } catch(e){}
@@ -696,7 +681,7 @@ function onIframeMessage(evt) {
                 cycleSettled = true;
                 finalizeCycle('impression');
             }
-            // Obs 4 : pour intext, scroller sur AdLoaded pour autoplay fiable
+            //pour intext, scroller sur AdLoaded pour autoplay fiable
             if (state.format === 'intext') {
                 const iframe = document.getElementById('adIframe');
                 try { iframe.contentWindow.postMessage({ cmd: 'scrollToAd' }, '*'); } catch(e) {}

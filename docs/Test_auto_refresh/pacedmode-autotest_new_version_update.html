@@ -432,6 +432,7 @@ function buildIframeContent(placement, env, format) {
   var _adPlaying        = false;  // true entre AdStarted et AdStopped
   var _attemptId        = null;   // attemptId du cycle courant
   var _pendingAttemptId = null;
+  var _cycleId          = 0;      // incrémenté à chaque doInit() — guard contre events d'anciens creatives
 
   function postUp(type, data) {
     try { window.parent.postMessage({ rsEvent: type, data: data || {} }, '*'); } catch(e){}

@@ -95,31 +95,50 @@
         .cycle-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1a1a1a; }
         .cycle-row:last-child { border-bottom: none; }
 
-        /* ── IFRAME PUB ── */
-        .iframe-panel { position: relative; }
-        .iframe-meta {
+        /* ── PREVIEW PUB ── */
+        .preview-panel { position: relative; }
+        .preview-meta {
             display: flex; align-items: center; gap: 10px;
             margin-bottom: 8px; font-size: 0.65em;
             color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
         }
-        .iframe-badge {
+        .preview-badge {
             display: inline-block; padding: 2px 8px; border-radius: 3px;
             font-weight: bold; background: rgba(41,182,246,0.12); color: var(--blue);
         }
-        #adIframe {
+        #adPreview {
             width: 100%;
-            height: 500px; 
+            min-height: 500px;
             border: 1px solid var(--border);
             border-radius: 4px;
-            background: #fff;
+            background:
+                linear-gradient(180deg, rgba(41,182,246,0.05), rgba(0,230,118,0.03)),
+                #101010;
             display: block;
+            padding: 22px;
+            color: #b8b8b8;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow: auto;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03), inset 0 20px 60px rgba(0,0,0,0.28);
         }
-        #adIframe.fmt-intext {
-            height: 720px;
-            overflow-y: auto;
+        #adPreview.fmt-intext {
+            min-height: 720px;
         }
-        .iframe-note {
-            margin-top: 6px; font-size: 0.61em; color: var(--muted); line-height: 1.6;
+        #adPreview .preview-copy {
+            max-width: 620px;
+            margin: 0 auto;
+            text-align: justify;
+        }
+        #adPreview .preview-label {
+            color: var(--muted);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
         }
 
         /* indicateur du pacing */
@@ -237,18 +256,23 @@
     <!-- côté à droite -->
     <div class="right-col">
 
-        <!-- IFRAME PUB VISIBLE -->
-        <div class="panel iframe-panel">
+        <!-- ZONE PUB VISIBLE -->
+        <div class="panel preview-panel">
             <div class="ptitle">
                 Aperçu de la Pub
                 <span id="versionBadge" style="color:var(--muted);font-size:0.85em;float:right;"></span>
             </div>
-            <div class="iframe-meta">
-                <span>Format : <span id="iframeFormatLabel" class="iframe-badge">SLIDER</span></span>
-                <span style="margin-left:auto;" id="iframeStatus" class="c-muted">En attente…</span>
+            <div class="preview-meta">
+                <span>Format : <span id="previewFormatLabel" class="preview-badge">SLIDER</span></span>
+                <span style="margin-left:auto;" id="previewStatus" class="c-muted">En attente…</span>
             </div>
             <div style="position:relative;">
-                <iframe id="adIframe" scrolling="no" frameborder="0"></iframe>
+                <div id="adPreview">
+                    <div class="preview-copy">
+                        <p class="preview-label">Zone de visualisation</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer luctus, nibh sed volutpat gravida, mi urna luctus erat, vitae pretium lectus sem at lorem.</p>
+                    </div>
+                </div>
                 <!-- Obs 1 : placeholder affiché après AdStopped jusqu'au prochain cycle -->
                 <div id="adPlaceholder">
                     <div class="ph-label">Pub terminée — prochain refresh dans</div>
@@ -335,9 +359,15 @@ let cycleStart     = null;
 let cycleImpCount  = 0;
 let cycleSettled   = false;
 let noimpTimer     = null;
-let rsPlayerReady  = false;   // true dès que rsplayer.js est chargé dans l'iframe
+let rsPlayerReady  = false;   // true dès que rsplayer.js est chargé dans la page
 let loopActive     = false;  //true si mode loop activé ET on est dans un cycle en cours
-let stopAdPending  = false;  //true quand stopAd() a été déclenché, en attente pendingInitFired; empêche le loop de doubler le init() déjà géré par pendingInit iframe
+let stopAdPending  = false;  //true quand stopAd() a été déclenché, en attente pendingInitFired; empêche le loop de doubler le init() déjà géré par pendingInit
+let RS             = null;
+let creative       = null;
+let adPlaying      = false;
+let pendingAttemptId = null;
+let activeAttemptId  = null;
+let rsCycleId      = 0;
 
 //  attemptId — identifiant unique par cycle (UUID court)
 // Permet de retracer à quel cycle appartient une AdImpression retardée,
@@ -360,316 +390,168 @@ window.onload = () => {
     if (state.placement) setParam('placement', state.placement);
     if (state.format)    setParam('format',    state.format);
 
-    window.addEventListener('message', onIframeMessage);
-
     if (state.running) {
         lockControls(true);
-        setStatus('running', 'Session active — chargement RSPlayer dans l\'iframe…');
-        // Écrire l'iframe : rsplayer.js se charge, attend les commandes 'init'
-        writeIframe(state.placement, state.env, state.format);
+        setStatus('running', 'Session active — chargement RSPlayer dans la page…');
+        loadRsPlayer(state.env);
     }
 };
-function buildIframeContent(placement, env, format) {
-    const playerUrl = PLAYER_URLS[env];
 
-    return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    font-family: Arial, sans-serif;
-    background: #fff;
-    color: #444;
-    font-size: 13px;
-    line-height: 1.65;
-  }
-  .page-wrap {
-    max-width: 620px;
-    margin: 0 auto;
-    padding: 20px 16px;
-  }
-  .fake-text {
-    color: #555;
-    text-align: justify;
-  }
-  .fake-text p { margin-bottom: 12px; }
-  /*centrer le player intext dans le flux de texte */
-  .fake-text > div[id],
-  .fake-text > div[class*="rs-"],
-  .fake-text > div[class*="retailspot"],
-  .fake-text > div:not(p):not(.fmt-label) {
-    display: flex !important;
-    justify-content: center !important;
-    margin: 16px auto !important;
-  }
-  /*intext : rendre le wrapper scrollable pour que la pub reste
-     ancrée dans le texte pendant le scroll — le lecteur peut lire
-     le texte d'après sans déplacer la vidéo */
-  .page-wrap {
-    overflow-y: auto;
-    max-height: 100vh;
-  }
-  /* slider : fake-text visible comme contexte éditorial,
-     On bloque les interactions sur le texte pour ne pas perturber le player. */
-  body.fmt-slider .fake-text {
-    opacity: 0.55;
-    pointer-events: none;
-    user-select: none;
-  }
-  .fmt-label {
-    font-size: 10px;
-    color: #bbb;
-    text-align: center;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-</style>
-</head>
-<body>
-<div class="page-wrap">
-  <p class="fmt-label" id="fmtLabel">Format : ${format.toUpperCase()}</p>
-  <div class="fake-text">
-    <p>${LOREM_TOP}</p>
-    <p>${LOREM_MID}</p>
-    <p>${LOREM_BTM}</p>
-  </div>
-</div>
-
-<script>
-  document.body.classList.add('fmt-' + ${JSON.stringify(format)});
-  var _placement  = ${JSON.stringify(placement)};
-  var _format     = ${JSON.stringify(format)};
-  var _playerUrl  = ${JSON.stringify(playerUrl)};
-  var _RS               = null;   // window.RetailSpot, disponible après chargement
-  var _rsReady          = false;  // true quand rsplayer.js est chargé
-  var _creative         = null;   // creative courant (pour appeler stopAd())
-  var _adPlaying        = false;  // true entre AdStarted et AdStopped
-  var _attemptId        = null;   // attemptId du cycle courant
-  var _pendingAttemptId = null;   // attemptId en attente si init() reçu pendant adPlaying
-  var _cycleId          = 0;      // compteur incrémenté à chaque doInit()
-                                  // capturé en closure dans chaque handler → les événements d'un ancien creative (cycle N-1) sont ignorés silencieusement
-
-  function postUp(type, data) {
-    try { window.parent.postMessage({ rsEvent: type, data: data || {} }, '*'); } catch(e){}
-  }
-
-  // RÉCEPTION DES COMMANDES DU PARENT
-  window.addEventListener('message', function(evt) {
-    if (!evt.data) return;
-
-    if (evt.data.cmd === 'scrollToAd') {
-      var el = document.querySelector('.fake-text');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    if (evt.data.cmd !== 'init') return;
-    if (!_rsReady || !_RS) {
-      postUp('notReady', { reason: 'RSPlayer pas encore chargé' });
-      return;
-    }
-
-    var incomingAttemptId = evt.data.attemptId || null;
-
-    if (_adPlaying && _creative) {
-      // pub en cours → stopAd() propre, relance sur AdStopped
-      _pendingAttemptId = incomingAttemptId;
-      postUp('stopAdCalled', { reason: 'init() reçu pendant adPlaying', attemptId: incomingAttemptId });
-      try { _creative.stopAd(); } catch(e) {
-        postUp('warn', { msg: 'stopAd() erreur: ' + e.message });
-      }
-      // doInit() sera déclenché par le handler AdStopped ci-dessous
-    } else {
-      // Pas de pub en cours → init() direct
-      _attemptId = incomingAttemptId;
-      doInit();
-    }
-  });
-
-  // INIT RS
-  function doInit() {
-    _adPlaying = false;
-    _creative  = null;
-
-    //capturer le cycleId courant en closure
-    // Chaque handler vérifie que myCycleId === _cycleId avant d'agir.
-    // Si un ancien creative émet AdStopped/AdImpression après un stopAd(),
-    // myCycleId sera périmé → ignoré silencieusement.
-    var myCycleId = ++_cycleId;
-
-    var cfg = {
-      placement:    _placement,
-      format:       _format,
-      width:        580,
-      height:       320,
-      videoFit:     'cover',
-      allowRefresh: true,
-      autoplay:     true,
-      muted:        true,
-      closeButton:  false
-    };
-    if (_format === 'intext') {
-      cfg.positionSelector = '.fake-text';
-    }
-
-    postUp('initCalled');
-
-    _RS.init(cfg, function(creative) {
-      // Vérifier que ce callback appartient bien au cycle courant
-      if (myCycleId !== _cycleId) return;
-
-      if (!creative) {
-        postUp('noad', { reason: 'creative null — placement invalide ou pas de campagne' });
+function loadRsPlayer(env) {
+    if (window.RetailSpot) {
+        onRsLoaded();
         return;
-      }
-
-      _creative = creative;
-      postUp('creativeReady');
-
-      creative.subscribe(function() {
-        if (myCycleId !== _cycleId) return;
-        postUp('AdLoaded');
-      }, _RS.VPAID_EVENTS.AdLoaded);
-
-      creative.subscribe(function() {
-        if (myCycleId !== _cycleId) return;
-        postUp('AdImpression', { attemptId: _attemptId });
-      }, _RS.VPAID_EVENTS.AdImpression);
-
-      creative.subscribe(function() {
-        if (myCycleId !== _cycleId) return;
-        _adPlaying = true;
-        postUp('AdStarted');
-      }, _RS.VPAID_EVENTS.AdStarted);
-
-      creative.subscribe(function() {
-        if (myCycleId !== _cycleId) return;
-        postUp('AdVideoComplete');
-      }, _RS.VPAID_EVENTS.AdVideoComplete);
-
-      creative.subscribe(function() {
-        if (myCycleId !== _cycleId) return;
-        _adPlaying = false;
-        _creative  = null;
-        postUp('AdStopped');
-        // init() en attente après stopAd() → relancer maintenant
-        if (_pendingAttemptId !== null) {
-          var next = _pendingAttemptId;
-          _pendingAttemptId = null;
-          _attemptId = next;
-          postUp('pendingInitFired', { attemptId: next });
-          doInit();
-        }
-      }, _RS.VPAID_EVENTS.AdStopped);
-
-      creative.subscribe(function(err) {
-        if (myCycleId !== _cycleId) return;
-        _adPlaying = false;
-        _creative  = null;
-        //extraire le code HTTP de l'objet erreur RS pour que le parent
-        // puisse distinguer 400/404 (placement invalide) des erreurs techniques
-        var errData = { err: JSON.stringify(err) };
-        if (err && err.code)   errData.code   = err.code;
-        if (err && err.status) errData.status = err.status;
-        if (err && err.message) errData.message = err.message;
-        postUp('AdError', errData);
-        // AdError = pub arrêtée → relancer si init() en attente
-        if (_pendingAttemptId !== null) {
-          var next = _pendingAttemptId;
-          _pendingAttemptId = null;
-          _attemptId = next;
-          postUp('pendingInitFired', { attemptId: next, fromError: true });
-          doInit();
-        }
-      }, _RS.VPAID_EVENTS.AdError);
-    });
-  }
-
-  //PerformanceObserver : surveiller les pixels d'impression RS
-  // Filtre les requêtes réseau contenant des mots-clés de tracking RS.
-  // Remonte l'URL + statut HTTP au parent via postUp('pixel', ...).
-  //permet de confirmer que le pixel a bien atteint le serveur (200)
-  // vs échoué (4xx) indépendamment des events VPAID.
-  (function() {
-    var _pixelKeywords = ['impression', 'track', 'pixel', 'beacon', 'event', 'retailspot', 'retailspotads'];
-    function checkEntry(entry) {
-      var url = entry.name || '';
-      var urlLow = url.toLowerCase();
-      var isRsPixel = _pixelKeywords.some(function(k) { return urlLow.indexOf(k) !== -1; });
-      if (!isRsPixel) return;
-      // Extraire le path sans le domaine (éviter regex avec ^ dans template literal)
-      var domainEnd = url.indexOf('/', url.indexOf('//') + 2);
-      var short = (domainEnd > 0 ? url.substring(domainEnd) : url).substring(0, 60);
-      var status = entry.responseStatus || 0;
-      postUp('pixel', { url: short, status: status, full: url });
     }
-    try {
-      var obs = new PerformanceObserver(function(list) {
-        list.getEntries().forEach(checkEntry);
-      });
-      obs.observe({ type: 'resource', buffered: true });
-    } catch(e) {
-      // PerformanceObserver non supporté — pas critique
-    }
-  })();
 
-  //Chargement RSPlayer UNE SEULE FOIS
-  var s = document.createElement('script');
-  s.src = _playerUrl;
-  s.onload = function() {
-    _RS = window.RetailSpot;
-    if (!_RS) {
-     	postUp('noad', { reason: 'RetailSpot undefined après chargement' });
-      	return; 
-    }
-    _rsReady = true;
-    postUp('rsLoaded', { version: _RS.version || '?' });
-    postUp('iframeReady');
-  };
-  s.onerror = function() {
-    postUp('noad', { reason: 'Erreur réseau — impossible de charger rsplayer.js' });
-  };
-  document.body.appendChild(s);
-<\/script>
-</body>
-</html>`;
+    const s = document.createElement('script');
+    s.src = PLAYER_URLS[env];
+    s.onload = onRsLoaded;
+    s.onerror = function() {
+        onRsEvent('noad', { reason: 'Erreur réseau — impossible de charger rsplayer.js' });
+    };
+    document.body.appendChild(s);
+    setPreviewStatus('Chargement RSPlayer…', 'var(--blue)');
 }
 
-// ÉCRITURE IFRAME 
-function writeIframe(placement, env, format) {
-    const iframe = document.getElementById('adIframe');
-    const content = buildIframeContent(placement, env, format);
-    try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write(content);
-        doc.close();
-        setIframeStatus('Chargement RSPlayer…', 'var(--blue)');
-    } catch(e) {
-        log('warn', 'iframe write error: ' + e.message);
+function onRsLoaded() {
+    RS = window.RetailSpot;
+    if (!RS) {
+        onRsEvent('noad', { reason: 'RetailSpot undefined après chargement' });
+        return;
     }
+    onRsEvent('rsLoaded', { version: RS.version || '?' });
+    onRsEvent('playerReady');
 }
 
-//  commande init vers l'iframe 
 function sendInit() {
-    const iframe = document.getElementById('adIframe');
-    try {
-        //passer l'attemptId à l'iframe pour qu'il le renvoie dans ses événements
-        iframe.contentWindow.postMessage({ cmd: 'init', attemptId: currentAttemptId }, '*');
-    } catch(e) {
-        log('warn', 'postMessage init failed: ' + e.message);
+    if (!rsPlayerReady || !RS) {
+        onRsEvent('notReady', { reason: 'RSPlayer pas encore chargé' });
+        return;
     }
+
+    if (adPlaying && creative) {
+        pendingAttemptId = currentAttemptId;
+        onRsEvent('stopAdCalled', { reason: 'init() reçu pendant adPlaying', attemptId: currentAttemptId });
+        try { creative.stopAd(); } catch(e) {
+            log('warn', 'stopAd() erreur: ' + e.message);
+        }
+        return;
+    }
+
+    activeAttemptId = currentAttemptId;
+    doRsInit();
 }
 
-//RÉCEPTION DES EVENTS DEPUIS L'IFRAME
-function onIframeMessage(evt) {
-    const msg = evt.data;
-    if (!msg || !msg.rsEvent) return;
+function doRsInit() {
+    adPlaying = false;
+    creative = null;
+
+    const myCycleId = ++rsCycleId;
+    const cfg = {
+        placement: state.placement,
+        format: state.format,
+        positionSelector: '#adPreview',
+        width: 580,
+        height: 320,
+        videoFit: 'cover',
+        allowRefresh: true,
+        autoplay: true,
+        muted: true,
+        closeButton: false
+    };
+
+    onRsEvent('initCalled');
+
+    RS.init(cfg, function(nextCreative) {
+        if (myCycleId !== rsCycleId) return;
+
+        if (!nextCreative) {
+            onRsEvent('noad', { reason: 'creative null — placement invalide ou pas de campagne' });
+            return;
+        }
+
+        creative = nextCreative;
+        onRsEvent('creativeReady');
+
+        creative.subscribe(function() {
+            if (myCycleId !== rsCycleId) return;
+            onRsEvent('AdLoaded');
+        }, RS.VPAID_EVENTS.AdLoaded);
+
+        creative.subscribe(function() {
+            if (myCycleId !== rsCycleId) return;
+            onRsEvent('AdImpression', { attemptId: activeAttemptId });
+        }, RS.VPAID_EVENTS.AdImpression);
+
+        creative.subscribe(function() {
+            if (myCycleId !== rsCycleId) return;
+            adPlaying = true;
+            onRsEvent('AdStarted');
+        }, RS.VPAID_EVENTS.AdStarted);
+
+        creative.subscribe(function() {
+            if (myCycleId !== rsCycleId) return;
+            onRsEvent('AdVideoComplete');
+        }, RS.VPAID_EVENTS.AdVideoComplete);
+
+        creative.subscribe(function() {
+            if (myCycleId !== rsCycleId) return;
+            adPlaying = false;
+            creative = null;
+            onRsEvent('AdStopped');
+            if (pendingAttemptId !== null) {
+                const next = pendingAttemptId;
+                pendingAttemptId = null;
+                activeAttemptId = next;
+                onRsEvent('pendingInitFired', { attemptId: next });
+                doRsInit();
+            }
+        }, RS.VPAID_EVENTS.AdStopped);
+
+        creative.subscribe(function(err) {
+            if (myCycleId !== rsCycleId) return;
+            adPlaying = false;
+            creative = null;
+            const errData = { err: JSON.stringify(err) };
+            if (err && err.code) errData.code = err.code;
+            if (err && err.status) errData.status = err.status;
+            if (err && err.message) errData.message = err.message;
+            onRsEvent('AdError', errData);
+            if (pendingAttemptId !== null) {
+                const next = pendingAttemptId;
+                pendingAttemptId = null;
+                activeAttemptId = next;
+                onRsEvent('pendingInitFired', { attemptId: next, fromError: true });
+                doRsInit();
+            }
+        }, RS.VPAID_EVENTS.AdError);
+    });
+}
+
+(function observeRsPixels() {
+    const pixelKeywords = ['impression', 'track', 'pixel', 'beacon', 'event', 'retailspot', 'retailspotads'];
+    function checkEntry(entry) {
+        const url = entry.name || '';
+        const urlLow = url.toLowerCase();
+        const isRsPixel = pixelKeywords.some(function(k) { return urlLow.indexOf(k) !== -1; });
+        if (!isRsPixel) return;
+        const domainEnd = url.indexOf('/', url.indexOf('//') + 2);
+        const short = (domainEnd > 0 ? url.substring(domainEnd) : url).substring(0, 60);
+        const status = entry.responseStatus || 0;
+        onRsEvent('pixel', { url: short, status: status, full: url });
+    }
+    try {
+        const obs = new PerformanceObserver(function(list) {
+            list.getEntries().forEach(checkEntry);
+        });
+        obs.observe({ type: 'resource', buffered: true });
+    } catch(e) {
+        // PerformanceObserver non supporté — pas critique
+    }
+})();
+
+function onRsEvent(type, data) {
+    const msg = { rsEvent: type, data: data || {} };
 
     switch(msg.rsEvent) {
         case 'rsLoaded':
@@ -677,11 +559,11 @@ function onIframeMessage(evt) {
             log('info', 'RSPlayer v' + (msg.data.version||'?') + ' chargé [' + state.env.toUpperCase() + ']');
             break;
 
-        case 'iframeReady':
-            // L'iframe est prête → lancer le premier cycle
+        case 'playerReady':
+            // RSPlayer est prêt → lancer le premier cycle
             rsPlayerReady = true;
-            log('info', 'Iframe prête — RS.init() sera appelé à chaque cycle');
-            setIframeStatus('Prêt — attente premier cycle…', 'var(--green)');
+            log('info', 'RSPlayer prêt — RS.init() sera appelé à chaque cycle');
+            setPreviewStatus('Prêt — attente premier cycle…', 'var(--green)');
             if (state.running) {
                 log('info', 'Premier cycle lancé');
                 launchCycle();
@@ -695,11 +577,11 @@ function onIframeMessage(evt) {
 
         case 'initCalled':
             log('info', '→ RS.init() appelé [cycle #' + state.refresh + ']');
-            setIframeStatus('RS.init() en cours…', 'var(--orange)');
+            setPreviewStatus('RS.init() en cours…', 'var(--orange)');
             break;
 
         case 'pixel': {
-            //pixel réseau détecté dans l'iframe via PerformanceObserver
+            //pixel réseau détecté dans la page via PerformanceObserver
             const pUrl    = msg.data.url    || '?';
             const pStatus = msg.data.status || 0;
             const pFull   = msg.data.full   || pUrl;
@@ -736,19 +618,19 @@ function onIframeMessage(evt) {
             // init() reçu pendant adPlaying → stopAd() déclenché, attente AdStopped
             stopAdPending = true;  //  bloquer le loop jusqu'à pendingInitFired
             log('warn', 'stopAd() appelé — init() en attente AdStopped [attempt:' + (msg.data.attemptId||'?') + ']');
-            setIframeStatus('stopAd() — attente AdStopped…', 'var(--orange)');
+            setPreviewStatus('stopAd() — attente AdStopped…', 'var(--orange)');
             break;
 
         case 'pendingInitFired':
             //AdStopped reçu après stopAd() → doInit() relancé proprement
             stopAdPending = false;  // débloquer le loop pour les prochains AdStopped
             log('info', '↺ Relance propre après AdStopped [attempt:' + (msg.data.attemptId||'?') + (msg.data.fromError?' · depuis AdError':'') + ']');
-            setIframeStatus('↺ Relance après stopAd…', 'var(--blue)');
+            setPreviewStatus('↺ Relance après stopAd…', 'var(--blue)');
             break;
 
         case 'creativeReady':
             log('info', '→ RS.init() callback reçu — chargement créatif en cours…');
-            setIframeStatus('Chargement créatif…', 'var(--orange)');
+            setPreviewStatus('Chargement créatif…', 'var(--orange)');
             break;
 
         case 'noad':
@@ -759,17 +641,17 @@ function onIframeMessage(evt) {
             saveState(); updateStats();
             log('noad', '🔴 noAd — ' + (msg.data.reason || 'creative null'));
             setStatus('warn', 'noAd — aucun créatif disponible');
-            setIframeStatus('noAd', 'var(--red)');
+            setPreviewStatus('noAd', 'var(--red)');
             finalizeCycle('noad');
             break;
 
         case 'AdLoaded':
             log('info', 'AdLoaded — créatif décodé, pixel d\'impression en route…');
-            setIframeStatus('AdLoaded — attente pixel impression…', 'var(--orange)');
+            setPreviewStatus('AdLoaded — attente pixel impression…', 'var(--orange)');
             if (state.format === 'intext') {
-                const iframe = document.getElementById('adIframe');
-                try { iframe.contentWindow.postMessage({ cmd: 'scrollToAd' }, '*'); } catch(e) {}
-                log('info', '↕ InText : scrollToAd envoyé — .fake-text forcé dans le viewport');
+                const preview = document.getElementById('adPreview');
+                if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                log('info', '↕ InText : #adPreview forcé dans le viewport');
             }
             break;
 
@@ -792,7 +674,7 @@ function onIframeMessage(evt) {
             saveState(); updateStats();
            log('imp', '✅ AdImpression — confirmé via du serveur · refresh #' + state.refresh + ' · imp. ce cycle: ' + cycleImpCount + ' · total: ' + state.imp + ' [attempt:' + recvAttempt + ']');
             setStatus('running', '✅ Impression #' + state.imp + ' — pub en cours…');
-           // setIframeStatus('✅ AdImpression — pixel serveur envoyé', 'var(--green)');
+           // setPreviewStatus('✅ AdImpression — pixel serveur envoyé', 'var(--green)');
             if (!cycleSettled && !state.loopMode) {
                 cycleSettled = true;
                 finalizeCycle('impression');
@@ -811,7 +693,7 @@ function onIframeMessage(evt) {
             // 2. stopAdPending = false (sinon c'est pendingInit qui gère — évite le double init())
             if (state.loopMode && loopActive && state.running && !stopAdPending) {
                 log('info', 'Loop — relance init() dans le cycle courant #' + state.refresh);
-                setIframeStatus('Loop — relance…', 'var(--blue)');
+                setPreviewStatus('Loop — relance…', 'var(--blue)');
                 sendInit();
             }
             break;
@@ -832,7 +714,7 @@ function onIframeMessage(evt) {
                     log('warn', 'AdError HTTP 400/404 — placement invalide ou sans campagne · ' + errStr);
                     log('noad', '🔴 noAd — placement refusé par le serveur (HTTP 400/404)');
                     setStatus('warn', 'noAd — placement invalide');
-                    setIframeStatus('🔴 noAd — placement refusé', 'var(--red)');
+                    setPreviewStatus('🔴 noAd — placement refusé', 'var(--red)');
                     finalizeCycle('noad');
                 } else {
                     state.noimp++;
@@ -840,7 +722,7 @@ function onIframeMessage(evt) {
                     log('warn', 'AdError technique — ' + errStr);
                     log('noimp', '🟡 noImpression — erreur technique (AdError)');
                     setStatus('warn', 'AdError → noImpression');
-                    setIframeStatus('AdError technique', 'var(--yellow)');
+                    setPreviewStatus('AdError technique', 'var(--yellow)');
                     finalizeCycle('noimp');
                 }
             }
@@ -848,8 +730,8 @@ function onIframeMessage(evt) {
     }
 }
 
-//LANCER UN CYCLE 
-// on envoie {cmd:'init'} à l'iframe → iframe appelle RS.init() complet.
+//LANCER UN CYCLE
+// RS.init() est appelé directement depuis le document courant.
 function launchCycle() {
     if (!state.running) return;
 
@@ -877,16 +759,15 @@ function launchCycle() {
             saveState(); updateStats();
             log('noimp', '🟡 noImpression — RS.init() sans réponse après 30s [attempt:' + currentAttemptId + ']');
             setStatus('warn', 'noImpression —(RS.init() sans réponse)');
-            setIframeStatus('🟡 TimeOut — pas de réponse RS', 'var(--yellow)');
+            setPreviewStatus('🟡 TimeOut — pas de réponse RS', 'var(--yellow)');
             finalizeCycle('noimp');
         }
     }, 30000);
 
     // timer fixe — le prochain cycle part toujours interval secondes après le début du cycle.
-    // L'iframe gère elle-même la collision via adPlaying + pendingInit.
+    // La page gère elle-même la collision via adPlaying + pendingInit.
     scheduleNextRefresh();
 
-    // Envoyer la commande init() à l'iframe
     sendInit();
 }
 
@@ -982,15 +863,15 @@ function onFormatChange(val) {
     updateFormatLabel(val);
 }
 function updateFormatLabel(val) {
-    document.getElementById('iframeFormatLabel').textContent = val.toUpperCase();
-    // hauteur iframe adaptée selon le format
-    const iframe = document.getElementById('adIframe');
-    if (iframe) {
-        iframe.classList.toggle('fmt-intext', val === 'intext');
+    document.getElementById('previewFormatLabel').textContent = val.toUpperCase();
+    // hauteur de la zone de visualisation adaptée selon le format
+    const preview = document.getElementById('adPreview');
+    if (preview) {
+        preview.classList.toggle('fmt-intext', val === 'intext');
     }
 }
-function setIframeStatus(msg, color) {
-    const el = document.getElementById('iframeStatus');
+function setPreviewStatus(msg, color) {
+    const el = document.getElementById('previewStatus');
     el.textContent = msg;
     el.style.color = color || 'var(--muted)';
 }

@@ -74,8 +74,8 @@
 
         .log-area { background: #060606; border: 1px solid var(--border); border-radius: 4px; height: 160px; overflow-y: auto; padding: 8px 10px; font-size: 0.72em; line-height: 1.8; }
         .log-imp   { color: var(--green); }
-        .log-noad  { color: var(--red); }
-        .log-noimp { color: var(--yellow); }
+        .log-noad  { color: var(--yellow); }
+        .log-noimp { color: var(--red); }
         .log-info  { color: var(--blue); }
         .log-warn  { color: var(--orange); }
 
@@ -86,8 +86,8 @@
         tbody tr:last-child td { border-bottom: none; }
         .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 0.82em; font-weight: bold; }
         .b-imp   { background: rgba(0,230,118,0.12); color: var(--green); }
-        .b-noad  { background: rgba(244,67,54,0.12);  color: var(--red); }
-        .b-noimp { background: rgba(255,235,59,0.12); color: var(--yellow); }
+        .b-noad  { background: rgba(255,235,59,0.12); color: var(--yellow); }
+        .b-noimp { background: rgba(244,67,54,0.12);  color: var(--red); }
         .b-env   { background: rgba(255,152,0,0.12);  color: var(--orange); font-size: 0.75em; }
         .b-env-prod { background: rgba(244,67,54,0.12); color: var(--red); font-size: 0.75em; }
 
@@ -222,8 +222,8 @@
 
             <div class="stats-grid">
                 <div class="stat"><div class="stat-label">Imp. Réelles</div><span class="stat-val c-green"  id="statImp">0</span></div>
-                <div class="stat"><div class="stat-label">noAd</div>        <span class="stat-val c-red"    id="statNoAd">0</span></div>
-                <div class="stat"><div class="stat-label">noImp.</div>      <span class="stat-val c-yellow" id="statNoImp">0</span></div>
+                <div class="stat"><div class="stat-label">noAd</div>        <span class="stat-val c-yellow" id="statNoAd">0</span></div>
+                <div class="stat"><div class="stat-label">AdError</div>     <span class="stat-val c-red"    id="statNoImp">0</span></div>
                 <div class="stat"><div class="stat-label">Refresh</div>     <span class="stat-val c-blue"   id="statRefresh">0</span></div>
             </div>
 
@@ -296,7 +296,7 @@
             <div class="ptitle">Historique des sessions</div>
             <div class="history-wrap">
                 <table>
-                    <thead><tr><th>Date & Heure</th><th>Placement</th><th>Env</th><th>Imp. Réelles</th><th>noAd</th><th>noImp.</th><th>Refresh</th></tr></thead>
+                    <thead><tr><th>Date & Heure</th><th>Placement</th><th>Env</th><th>Imp. Réelles</th><th>noAd</th><th>AdError</th><th>Refresh</th></tr></thead>
                     <tbody id="historyBody"></tbody>
                 </table>
             </div>
@@ -371,7 +371,7 @@ let rsCycleId      = 0;
 
 //  attemptId — identifiant unique par cycle (UUID court)
 // Permet de retracer à quel cycle appartient une AdImpression retardée,
-// même si elle arrive après le timeout noImp et dans la fenêtre du cycle suivant.
+// même si elle arrive après le timeout AdError et dans la fenêtre du cycle suivant.
 let currentAttemptId = null;
 function genAttemptId() {
     return 'a' + Math.random().toString(36).slice(2, 9) + '-' + Date.now().toString(36);
@@ -407,7 +407,7 @@ function loadRsPlayer(env) {
     s.src = PLAYER_URLS[env];
     s.onload = onRsLoaded;
     s.onerror = function() {
-        onRsEvent('noad', { reason: 'Erreur réseau — impossible de charger rsplayer.js' });
+        onRsEvent('playerError', { reason: 'Erreur réseau — impossible de charger rsplayer.js' });
     };
     document.body.appendChild(s);
     setPreviewStatus('Chargement RSPlayer…', 'var(--blue)');
@@ -416,7 +416,7 @@ function loadRsPlayer(env) {
 function onRsLoaded() {
     RS = window.RetailSpot;
     if (!RS) {
-        onRsEvent('noad', { reason: 'RetailSpot undefined après chargement' });
+        onRsEvent('playerError', { reason: 'RetailSpot undefined après chargement' });
         return;
     }
     onRsEvent('rsLoaded', { version: RS.version || '?' });
@@ -466,7 +466,7 @@ function doRsInit() {
         if (myCycleId !== rsCycleId) return;
 
         if (!nextCreative) {
-            onRsEvent('noad', { reason: 'creative null — placement invalide ou pas de campagne' });
+            onRsEvent('playerError', { reason: 'creative null — callback RS.init sans créatif' });
             return;
         }
 
@@ -633,16 +633,16 @@ function onRsEvent(type, data) {
             setPreviewStatus('Chargement créatif…', 'var(--orange)');
             break;
 
-        case 'noad':
+        case 'playerError':
             if (cycleSettled) return;
             cycleSettled = true;
             if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
-            state.noad++;
+            state.noimp++;
             saveState(); updateStats();
-            log('noad', '🔴 noAd — ' + (msg.data.reason || 'creative null'));
-            setStatus('warn', 'noAd — aucun créatif disponible');
-            setPreviewStatus('noAd', 'var(--red)');
-            finalizeCycle('noad');
+            log('noimp', '🔴 AdError — ' + (msg.data.reason || 'erreur player'));
+            setStatus('warn', 'AdError — erreur player');
+            setPreviewStatus('AdError player', 'var(--red)');
+            finalizeCycle('noimp');
             break;
 
         case 'AdLoaded':
@@ -702,27 +702,30 @@ function onRsEvent(type, data) {
             if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
             if (!cycleSettled) {
                 cycleSettled = true;
-                const errStr = msg.data.err || msg.data.message || '?';
-                const errCode = msg.data.code || msg.data.status || 0;
-                // HTTP 400/404 = placement invalide → noAd
-                // autres codes = erreur technique → noImp
-                const isInvalidPlacement = errCode === 400 || errCode === 404
-                    || /400|404|Bad Request|Not Found/i.test(errStr);
-                if (isInvalidPlacement) {
+                const errStr = [
+                    msg.data.err,
+                    msg.data.message,
+                    msg.data.reason,
+                    msg.data.code,
+                    msg.data.status
+                ].filter(v => v !== undefined && v !== null).join(' ') || '?';
+                // noAd est compté uniquement si AdError contient explicitement "noAd".
+                const isNoAd = /no\s*ad/i.test(errStr);
+                if (isNoAd) {
                     state.noad++;
                     saveState(); updateStats();
-                    log('warn', 'AdError HTTP 400/404 — placement invalide ou sans campagne · ' + errStr);
-                    log('noad', '🔴 noAd — placement refusé par le serveur (HTTP 400/404)');
-                    setStatus('warn', 'noAd — placement invalide');
-                    setPreviewStatus('🔴 noAd — placement refusé', 'var(--red)');
+                    log('warn', 'AdError noAd — ' + errStr);
+                    log('noad', '🟡 noAd — AdError contient noAd');
+                    setStatus('warn', 'noAd — aucun créatif disponible');
+                    setPreviewStatus('🟡 noAd', 'var(--yellow)');
                     finalizeCycle('noad');
                 } else {
                     state.noimp++;
                     saveState(); updateStats();
                     log('warn', 'AdError technique — ' + errStr);
-                    log('noimp', '🟡 noImpression — erreur technique (AdError)');
-                    setStatus('warn', 'AdError → noImpression');
-                    setPreviewStatus('AdError technique', 'var(--yellow)');
+                    log('noimp', '🔴 AdError — erreur technique');
+                    setStatus('warn', 'AdError — erreur technique');
+                    setPreviewStatus('🔴 AdError technique', 'var(--red)');
                     finalizeCycle('noimp');
                 }
             }
@@ -757,9 +760,9 @@ function launchCycle() {
             cycleSettled = true;
             state.noimp++;
             saveState(); updateStats();
-            log('noimp', '🟡 noImpression — RS.init() sans réponse après 30s [attempt:' + currentAttemptId + ']');
-            setStatus('warn', 'noImpression —(RS.init() sans réponse)');
-            setPreviewStatus('🟡 TimeOut — pas de réponse RS', 'var(--yellow)');
+            log('noimp', '🔴 AdError — RS.init() sans réponse après 30s [attempt:' + currentAttemptId + ']');
+            setStatus('warn', 'AdError — RS.init() sans réponse');
+            setPreviewStatus('🔴 AdError — pas de réponse RS', 'var(--red)');
             finalizeCycle('noimp');
         }
     }, 30000);
@@ -779,8 +782,8 @@ function finalizeCycle(result) {
     document.getElementById('cycleLoad').innerText = `${elapsed}ms`;
     document.getElementById('cycleResult').innerHTML =
         result==='impression'  ? `<span class="c-green">✅ ${cycleImpCount} impression(s) serveur</span>` :
-        result==='noad'        ? `<span class="c-red">🔴 noAd</span>` :
-                                 `<span class="c-yellow">🟡 noImpression (pacing)</span>`;
+        result==='noad'        ? `<span class="c-yellow">🟡 noAd</span>` :
+                                 `<span class="c-red">🔴 AdError</span>`;
     cycleData.push({n:state.refresh, imp:cycleImpCount, result});
     if (cycleData.length > 20) cycleData.shift();
     localStorage.setItem('qa_cycle_data', JSON.stringify(cycleData));
@@ -917,7 +920,7 @@ function loadHistory() {
             <td><span class="badge ${r.env==='prod'?'b-env-prod':'b-env'}">${(r.env||'?').toUpperCase()}</span></td>
             <td><span class="badge b-imp">${r.imp} imp</span></td>
             <td><span class="badge b-noad">${r.noad} noAd</span></td>
-            <td><span class="badge b-noimp">${r.noimp} noImp</span></td>
+            <td><span class="badge b-noimp">${r.noimp} AdError</span></td>
             <td style="color:var(--blue)">${r.refresh}</td>
         </tr>`).join('');
 }

@@ -371,6 +371,7 @@ let creative       = null;
 let adInProgress   = false;   // true entre AdStarted et AdStopped
 let waitingForAdStoppedBeforeNextRefresh = false;
 let pendingAttemptId = null;
+let stopAdPendingForInit = false;
 let activeAttemptId  = null;
 let rsCycleId      = 0;
 let nextRefreshScheduled = false;
@@ -436,13 +437,14 @@ function sendInit() {
         return false;
     }
 
-    if (adInProgress && creative) {
+    if (creative) {
         if (state.uninterruptedMode) {
-            onRsEvent('initQueuedUntilAdStopped', { reason: 'init() reçu pendant adInProgress', attemptId: currentAttemptId });
+            onRsEvent('initQueuedUntilAdStopped', { reason: 'init() reçu avec creative actif', attemptId: currentAttemptId });
             return false;
         }
         pendingAttemptId = currentAttemptId;
-        onRsEvent('stopAdCalled', { reason: 'init() reçu pendant adInProgress', attemptId: currentAttemptId });
+        stopAdPendingForInit = true;
+        onRsEvent('stopAdCalled', { reason: 'init() reçu avec creative actif', attemptId: currentAttemptId });
         try { creative.stopAd(); } catch(e) {
             log('warn', 'stopAd() erreur: ' + e.message);
         }
@@ -512,14 +514,7 @@ function doRsInit() {
             adInProgress = false;
             creative = null;
             onRsEvent('AdStopped');
-            if (pendingAttemptId !== null) {
-                const next = pendingAttemptId;
-                pendingAttemptId = null;
-                activeAttemptId = next;
-                onRsEvent('pendingInitFired', { attemptId: next });
-                doRsInit();
-                startCycleTimers();
-            }
+            firePendingInitAfterStop(false);
         }, RS.VPAID_EVENTS.AdStopped);
 
         creative.subscribe(function(err) {
@@ -531,16 +526,25 @@ function doRsInit() {
             if (err && err.status) errData.status = err.status;
             if (err && err.message) errData.message = err.message;
             onRsEvent('AdError', errData);
-            if (pendingAttemptId !== null) {
-                const next = pendingAttemptId;
-                pendingAttemptId = null;
-                activeAttemptId = next;
-                onRsEvent('pendingInitFired', { attemptId: next, fromError: true });
-                doRsInit();
-                startCycleTimers();
-            }
+            firePendingInitAfterStop(true);
         }, RS.VPAID_EVENTS.AdError);
     });
+}
+
+function firePendingInitAfterStop(fromError) {
+    if (pendingAttemptId === null) return;
+
+    const next = pendingAttemptId;
+    pendingAttemptId = null;
+    stopAdPendingForInit = false;
+    activeAttemptId = next;
+    onRsEvent('pendingInitFired', { attemptId: next, fromError: fromError === true });
+
+    setTimeout(function() {
+        if (!state.running) return;
+        doRsInit();
+        startCycleTimers();
+    }, 0);
 }
 
 (function observeRsPixels() {
@@ -650,7 +654,7 @@ function onRsEvent(type, data) {
         case 'creativeReady':
             if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
             log('info', '→ RS.init() callback reçu — chargement créatif en cours…');
-            setPreviewStatus('Chargement créatif…', 'var(--orange)');
+            setPreviewStatus('Chargement créatif… [attempt:' + (activeAttemptId || '?') + ']', 'var(--orange)');
             break;
 
         case 'playerError':
@@ -720,6 +724,9 @@ function onRsEvent(type, data) {
         case 'AdStopped':
             adInProgress = false;
             log('info', 'AdStopped');
+            if (stopAdPendingForInit) {
+                setPreviewStatus('AdStopped reçu — relance RS.init()…', 'var(--blue)');
+            }
             if (
                 state.uninterruptedMode &&
                 cycleSettled &&
@@ -730,7 +737,7 @@ function onRsEvent(type, data) {
                 log('info', 'Pub terminée — démarrage du timer du prochain refresh');
                 setPreviewStatus('Pub terminée — timer du prochain refresh…', 'var(--blue)');
                 scheduleNextRefresh();
-            } else {
+            } else if (!stopAdPendingForInit) {
                 setPreviewStatus('AdStopped — attente prochain refresh…', 'var(--muted)');
             }
             break;
@@ -782,6 +789,7 @@ function launchCycle() {
     cycleStart    = Date.now();
     nextRefreshScheduled = false;
     waitingForAdStoppedBeforeNextRefresh = false;
+    stopAdPendingForInit = false;
 
     //générer un attemptId unique pour ce cycle
     currentAttemptId = genAttemptId();

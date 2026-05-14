@@ -216,10 +216,10 @@
             </select>
 
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:4px;">
-                <input type="checkbox" id="loopModeCheck" onchange="onLoopModeChange(this.checked)"
+                <input type="checkbox" id="uninterruptedModeCheck" onchange="onUninterruptedModeChange(this.checked)"
                     style="width:14px;height:14px;accent-color:var(--blue);cursor:pointer;">
                 <span style="font-size:11px;color:var(--muted);">
-                    Mode loop
+                    Pub non interrompue
                 </span>
             </label>
 
@@ -353,7 +353,7 @@ let state = {
     placement: getParam('placement') || localStorage.getItem('qa_placement') || '',
     format:    getParam('format')    || localStorage.getItem('qa_format')    || 'slider',
     interval:  parseInt(localStorage.getItem('qa_interval')) || 60,
-    loopMode:  localStorage.getItem('qa_loopMode') === 'true',
+    uninterruptedMode: localStorage.getItem('qa_uninterruptedMode') === 'true',
     imp:       parseInt(localStorage.getItem('qa_imp'))      || 0,
     noad:      parseInt(localStorage.getItem('qa_noad'))     || 0,
     noimp:     parseInt(localStorage.getItem('qa_noimp'))    || 0,
@@ -366,14 +366,13 @@ let cycleImpCount  = 0;
 let cycleSettled   = false;
 let noimpTimer     = null;
 let rsPlayerReady  = false;   // true dès que rsplayer.js est chargé dans la page
-let loopActive     = false;  //true si mode loop activé ET on est dans un cycle en cours
-let stopAdPending  = false;  //true quand stopAd() a été déclenché, en attente pendingInitFired; empêche le loop de doubler le init() déjà géré par pendingInit
 let RS             = null;
 let creative       = null;
-let adPlaying      = false;
+let adInProgress   = false;   // true entre AdStarted et AdStopped
 let pendingAttemptId = null;
 let activeAttemptId  = null;
 let rsCycleId      = 0;
+let nextRefreshScheduled = false;
 
 //  attemptId — identifiant unique par cycle (UUID court)
 // Permet de retracer à quel cycle appartient une AdImpression retardée,
@@ -386,10 +385,11 @@ function genAttemptId() {
 
 // INIT PAGE
 window.onload = () => {
+    localStorage.removeItem('qa_loopMode');
     document.getElementById('placementInput').value = state.placement;
     document.getElementById('formatSelect').value   = state.format;
     document.getElementById('intervalSelect').value = state.interval;
-    document.getElementById('loopModeCheck').checked = state.loopMode;
+    document.getElementById('uninterruptedModeCheck').checked = state.uninterruptedMode;
     setEnvUI(state.env);
     updateFormatLabel(state.format);
     updateStats(); loadHistory(); drawChart();
@@ -435,9 +435,13 @@ function sendInit() {
         return;
     }
 
-    if (adPlaying && creative) {
+    if (adInProgress && creative) {
+        if (state.uninterruptedMode) {
+            onRsEvent('initQueuedUntilAdStopped', { reason: 'init() reçu pendant adInProgress', attemptId: currentAttemptId });
+            return;
+        }
         pendingAttemptId = currentAttemptId;
-        onRsEvent('stopAdCalled', { reason: 'init() reçu pendant adPlaying', attemptId: currentAttemptId });
+        onRsEvent('stopAdCalled', { reason: 'init() reçu pendant adInProgress', attemptId: currentAttemptId });
         try { creative.stopAd(); } catch(e) {
             log('warn', 'stopAd() erreur: ' + e.message);
         }
@@ -449,7 +453,7 @@ function sendInit() {
 }
 
 function doRsInit() {
-    adPlaying = false;
+    adInProgress = false;
     creative = null;
 
     const myCycleId = ++rsCycleId;
@@ -491,7 +495,7 @@ function doRsInit() {
 
         creative.subscribe(function() {
             if (myCycleId !== rsCycleId) return;
-            adPlaying = true;
+            adInProgress = true;
             onRsEvent('AdStarted');
         }, RS.VPAID_EVENTS.AdStarted);
 
@@ -502,7 +506,7 @@ function doRsInit() {
 
         creative.subscribe(function() {
             if (myCycleId !== rsCycleId) return;
-            adPlaying = false;
+            adInProgress = false;
             creative = null;
             onRsEvent('AdStopped');
             if (pendingAttemptId !== null) {
@@ -516,7 +520,7 @@ function doRsInit() {
 
         creative.subscribe(function(err) {
             if (myCycleId !== rsCycleId) return;
-            adPlaying = false;
+            adInProgress = false;
             creative = null;
             const errData = { err: JSON.stringify(err) };
             if (err && err.code) errData.code = err.code;
@@ -621,17 +625,20 @@ function onRsEvent(type, data) {
         }
 
         case 'stopAdCalled':
-            // init() reçu pendant adPlaying → stopAd() déclenché, attente AdStopped
-            stopAdPending = true;  //  bloquer le loop jusqu'à pendingInitFired
+            // init() reçu pendant adInProgress → stopAd() déclenché, attente AdStopped
             log('warn', 'stopAd() appelé — init() en attente AdStopped [attempt:' + (msg.data.attemptId||'?') + ']');
             setPreviewStatus('stopAd() — attente AdStopped…', 'var(--orange)');
             break;
 
+        case 'initQueuedUntilAdStopped':
+            log('info', 'Pub non interrompue — init() en attente AdStopped [attempt:' + (msg.data.attemptId||'?') + ']');
+            setPreviewStatus('Pub en cours — prochain refresh en attente…', 'var(--orange)');
+            break;
+
         case 'pendingInitFired':
-            //AdStopped reçu après stopAd() → doInit() relancé proprement
-            stopAdPending = false;  // débloquer le loop pour les prochains AdStopped
+            //AdStopped reçu après init en attente → doInit() relancé proprement
             log('info', '↺ Relance propre après AdStopped [attempt:' + (msg.data.attemptId||'?') + (msg.data.fromError?' · depuis AdError':'') + ']');
-            setPreviewStatus('↺ Relance après stopAd…', 'var(--blue)');
+            setPreviewStatus('↺ Relance après AdStopped…', 'var(--blue)');
             break;
 
         case 'creativeReady':
@@ -662,6 +669,7 @@ function onRsEvent(type, data) {
             break;
 
         case 'AdStarted':
+            adInProgress = true;
             log('info', 'AdStarted — lecture vidéo démarrée');
             setPreviewStatus('AdPlaying — lecture en cours…', 'var(--green)');
             break;
@@ -682,7 +690,7 @@ function onRsEvent(type, data) {
            log('imp', '✅ AdImpression — confirmé via du serveur · refresh #' + state.refresh + ' · imp. ce cycle: ' + cycleImpCount + ' · total: ' + state.imp + ' [attempt:' + recvAttempt + ']');
             setStatus('running', '✅ Impression #' + state.imp + ' — pub en cours…');
             setPreviewStatus('AdImpression — pixel serveur confirmé', 'var(--green)');
-            if (!cycleSettled && !state.loopMode) {
+            if (!cycleSettled) {
                 cycleSettled = true;
                 finalizeCycle('impression');
             }
@@ -695,19 +703,19 @@ function onRsEvent(type, data) {
             break;
 
         case 'AdStopped':
+            adInProgress = false;
             log('info', 'AdStopped');
-            setPreviewStatus('AdStopped — attente prochain refresh…', 'var(--muted)');
-            //  mode loop — relancer init() seulement si :
-            // 1. loopMode activé + cycle en cours + test running
-            // 2. stopAdPending = false (sinon c'est pendingInit qui gère — évite le double init())
-            if (state.loopMode && loopActive && state.running && !stopAdPending) {
-                log('info', 'Loop — relance init() dans le cycle courant #' + state.refresh);
-                setPreviewStatus('Loop — relance…', 'var(--blue)');
-                sendInit();
+            if (state.uninterruptedMode && cycleSettled && state.running) {
+                log('info', 'Pub terminée — démarrage du timer du prochain refresh');
+                setPreviewStatus('Pub terminée — timer du prochain refresh…', 'var(--blue)');
+                scheduleNextRefresh();
+            } else {
+                setPreviewStatus('AdStopped — attente prochain refresh…', 'var(--muted)');
             }
             break;
 
         case 'AdError':
+            adInProgress = false;
             if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
             if (!cycleSettled) {
                 cycleSettled = true;
@@ -750,12 +758,10 @@ function launchCycle() {
     cycleImpCount = 0;
     cycleSettled  = false;
     cycleStart    = Date.now();
+    nextRefreshScheduled = false;
 
     //générer un attemptId unique pour ce cycle
     currentAttemptId = genAttemptId();
-    loopActive    = true;   //autoriser les relances loop dans ce cycle
-    stopAdPending = false;  // reset au début de chaque cycle
-
     state.refresh++;
     saveState(); updateStats();
 
@@ -768,9 +774,11 @@ function launchCycle() {
         settleCurrentCycleAsNoImp('RS.init() sans réponse après 30s');
     }, 30000);
 
-    // timer fixe — le prochain cycle part toujours interval secondes après le début du cycle.
-    // La page gère elle-même la collision via adPlaying + pendingInit.
-    scheduleNextRefresh();
+    // En mode standard, le prochain cycle est planifié dès le début du cycle courant.
+    // En mode pub non interrompue, il sera planifié à la fin réelle de la pub.
+    if (!state.uninterruptedMode) {
+        scheduleNextRefresh();
+    }
 
     sendInit();
 }
@@ -793,6 +801,10 @@ function finalizeCycle(result) {
     impHist.push({n: state.refresh, total: state.imp});
     localStorage.setItem('qa_imp_history', JSON.stringify(impHist));
     drawChart();
+
+    if (state.uninterruptedMode && !adInProgress && state.running) {
+        scheduleNextRefresh();
+    }
 }
 
 function settleCurrentCycleAsNoImp(reason) {
@@ -810,6 +822,8 @@ function settleCurrentCycleAsNoImp(reason) {
 //  TIMER
 function scheduleNextRefresh() {
     if (!state.running) return;
+    if (nextRefreshScheduled) return;
+    nextRefreshScheduled = true;
     const nextAt = new Date(Date.now() + state.interval * 1000);
     document.getElementById('cycleNext').innerText =
         nextAt.toLocaleTimeString('fr-FR') + ` (dans ${state.interval}s)`;
@@ -818,18 +832,18 @@ function scheduleNextRefresh() {
     setTimeout(() => { bar.style.transition=`width ${state.interval}s linear`; bar.style.width='100%'; }, 100);
     refreshTimer = setTimeout(function() {
         settleCurrentCycleAsNoImp('refresh suivant après ' + state.interval + 's sans AdLoaded/AdImpression');
-        loopActive = false;  // couper la loop avant de démarrer le nouveau cycle
+        nextRefreshScheduled = false;
         launchCycle();
     }, state.interval * 1000);
 }
 
-//  LOOP MODE
-function onLoopModeChange(checked) {
-    state.loopMode = checked;
-    localStorage.setItem('qa_loopMode', checked);
+//  PUB NON INTERROMPUE
+function onUninterruptedModeChange(checked) {
+    state.uninterruptedMode = checked;
+    localStorage.setItem('qa_uninterruptedMode', checked);
     log('info', checked
-        ? 'Mode loop activé — init() relancé après chaque AdStopped dans le cycle'
-        : 'Mode loop désactivé — une impression par cycle');
+        ? 'Pub non interrompue activée — le timer du prochain refresh démarre après AdStopped'
+        : 'Pub non interrompue désactivée — le refresh peut interrompre une pub en cours');
 }
 
 // START / STOP
@@ -854,6 +868,7 @@ function startTest() {
 function stopTest(msg) {
     if (refreshTimer) clearTimeout(refreshTimer);
     if (noimpTimer)   clearTimeout(noimpTimer);
+    nextRefreshScheduled = false;
     const history = JSON.parse(localStorage.getItem('qa_history')||'[]');
     history.unshift({
         date: new Date().toLocaleString('fr-FR'),
@@ -898,6 +913,7 @@ function saveState() {
     Object.entries({
         qa_running:  state.running, qa_env: state.env, qa_placement: state.placement,
         qa_format:   state.format,  qa_interval: state.interval,
+        qa_uninterruptedMode: state.uninterruptedMode,
         qa_imp:      state.imp,     qa_noad: state.noad,
         qa_noimp:    state.noimp,   qa_refresh: state.refresh
     }).forEach(([k,v]) => localStorage.setItem(k,v));
@@ -909,7 +925,7 @@ function updateStats() {
     document.getElementById('statRefresh').innerText = state.refresh;
 }
 function lockControls(lock) {
-    ['placementInput','formatSelect','intervalSelect','startBtn','btnPreprod','btnProd']
+    ['placementInput','formatSelect','intervalSelect','uninterruptedModeCheck','startBtn','btnPreprod','btnProd']
         .forEach(id => document.getElementById(id).disabled = lock);
     document.getElementById('stopBtn').disabled = !lock;
 }
@@ -1022,7 +1038,7 @@ function drawChart() {
 
 function prepareNew() {
     if (state.running) return alert('Arrêtez le test d\'abord.');
-    ['qa_placement','qa_imp','qa_noad','qa_noimp','qa_refresh','qa_running','qa_cycle_data']
+    ['qa_placement','qa_imp','qa_noad','qa_noimp','qa_refresh','qa_running','qa_cycle_data','qa_uninterruptedMode','qa_loopMode']
         .forEach(k=>localStorage.removeItem(k));
     const u=new URL(window.location.href);u.searchParams.delete('placement');window.location.href=u.toString();
 }

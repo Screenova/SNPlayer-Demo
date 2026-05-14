@@ -433,24 +433,26 @@ function onRsLoaded() {
 function sendInit() {
     if (!rsPlayerReady || !RS) {
         onRsEvent('notReady', { reason: 'RSPlayer pas encore chargé' });
-        return;
+        return false;
     }
 
     if (adInProgress && creative) {
         if (state.uninterruptedMode) {
             onRsEvent('initQueuedUntilAdStopped', { reason: 'init() reçu pendant adInProgress', attemptId: currentAttemptId });
-            return;
+            return false;
         }
         pendingAttemptId = currentAttemptId;
         onRsEvent('stopAdCalled', { reason: 'init() reçu pendant adInProgress', attemptId: currentAttemptId });
         try { creative.stopAd(); } catch(e) {
             log('warn', 'stopAd() erreur: ' + e.message);
         }
-        return;
+        return false;
     }
 
     activeAttemptId = currentAttemptId;
     doRsInit();
+    startCycleTimers();
+    return true;
 }
 
 function doRsInit() {
@@ -516,6 +518,7 @@ function doRsInit() {
                 activeAttemptId = next;
                 onRsEvent('pendingInitFired', { attemptId: next });
                 doRsInit();
+                startCycleTimers();
             }
         }, RS.VPAID_EVENTS.AdStopped);
 
@@ -534,6 +537,7 @@ function doRsInit() {
                 activeAttemptId = next;
                 onRsEvent('pendingInitFired', { attemptId: next, fromError: true });
                 doRsInit();
+                startCycleTimers();
             }
         }, RS.VPAID_EVENTS.AdError);
     });
@@ -628,6 +632,7 @@ function onRsEvent(type, data) {
         case 'stopAdCalled':
             // init() reçu pendant adInProgress → stopAd() déclenché, attente AdStopped
             log('warn', 'stopAd() appelé — init() en attente AdStopped [attempt:' + (msg.data.attemptId||'?') + ']');
+            setStatus('running', 'stopAd() appelé — attente AdStopped avant RS.init()…');
             setPreviewStatus('stopAd() — attente AdStopped…', 'var(--orange)');
             break;
 
@@ -792,6 +797,13 @@ function launchCycle() {
         ? 'En attente AdStopped'
         : '—';
 
+    sendInit();
+}
+
+function startCycleTimers() {
+    if (!state.running) return;
+    cycleStart = Date.now();
+
     //watchdog 30s — détecte uniquement les cas où RS.init() ne répond jamais (réseau mort, player crash, placement invalide sans noad).
     if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
     noimpTimer = setTimeout(function() {
@@ -803,8 +815,6 @@ function launchCycle() {
     if (!state.uninterruptedMode) {
         scheduleNextRefresh();
     }
-
-    sendInit();
 }
 
 // FINALISER UN CYCLE

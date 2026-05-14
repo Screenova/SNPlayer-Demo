@@ -643,6 +643,7 @@ function onRsEvent(type, data) {
             break;
 
         case 'creativeReady':
+            if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
             log('info', '→ RS.init() callback reçu — chargement créatif en cours…');
             setPreviewStatus('Chargement créatif…', 'var(--orange)');
             break;

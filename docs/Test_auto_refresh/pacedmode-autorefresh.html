@@ -369,6 +369,7 @@ let rsPlayerReady  = false;   // true dès que rsplayer.js est chargé dans la p
 let RS             = null;
 let creative       = null;
 let adInProgress   = false;   // true entre AdStarted et AdStopped
+let waitingForAdStoppedBeforeNextRefresh = false;
 let pendingAttemptId = null;
 let activeAttemptId  = null;
 let rsCycleId      = 0;
@@ -649,6 +650,7 @@ function onRsEvent(type, data) {
         case 'playerError':
             if (cycleSettled) return;
             cycleSettled = true;
+            waitingForAdStoppedBeforeNextRefresh = false;
             if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
             state.noimp++;
             saveState(); updateStats();
@@ -672,6 +674,9 @@ function onRsEvent(type, data) {
             adInProgress = true;
             log('info', 'AdStarted — lecture vidéo démarrée');
             setPreviewStatus('AdPlaying — lecture en cours…', 'var(--green)');
+            if (state.uninterruptedMode && cycleSettled) {
+                waitingForAdStoppedBeforeNextRefresh = true;
+            }
             break;
 
         case 'AdImpression': {
@@ -692,6 +697,10 @@ function onRsEvent(type, data) {
             setPreviewStatus('AdImpression — pixel serveur confirmé', 'var(--green)');
             if (!cycleSettled) {
                 cycleSettled = true;
+                if (state.uninterruptedMode) {
+                    waitingForAdStoppedBeforeNextRefresh = true;
+                    setStatus('running', '✅ Impression #' + state.imp + ' — attente AdStopped avant timer…');
+                }
                 finalizeCycle('impression');
             }
             break;
@@ -705,7 +714,13 @@ function onRsEvent(type, data) {
         case 'AdStopped':
             adInProgress = false;
             log('info', 'AdStopped');
-            if (state.uninterruptedMode && cycleSettled && state.running) {
+            if (
+                state.uninterruptedMode &&
+                cycleSettled &&
+                state.running &&
+                waitingForAdStoppedBeforeNextRefresh
+            ) {
+                waitingForAdStoppedBeforeNextRefresh = false;
                 log('info', 'Pub terminée — démarrage du timer du prochain refresh');
                 setPreviewStatus('Pub terminée — timer du prochain refresh…', 'var(--blue)');
                 scheduleNextRefresh();
@@ -716,6 +731,7 @@ function onRsEvent(type, data) {
 
         case 'AdError':
             adInProgress = false;
+            waitingForAdStoppedBeforeNextRefresh = false;
             if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
             if (!cycleSettled) {
                 cycleSettled = true;
@@ -759,6 +775,7 @@ function launchCycle() {
     cycleSettled  = false;
     cycleStart    = Date.now();
     nextRefreshScheduled = false;
+    waitingForAdStoppedBeforeNextRefresh = false;
 
     //générer un attemptId unique pour ce cycle
     currentAttemptId = genAttemptId();
@@ -767,6 +784,12 @@ function launchCycle() {
 
     log('info', 'Refresh #' + state.refresh + ' — RS.init() [' + state.format.toUpperCase() + '] · ' + state.placement.substring(0,18) + '… [attempt:' + currentAttemptId + ']');
     setStatus('running', 'Refresh #' + state.refresh + ' — RS.init() envoyé, attente serveur…');
+    const bar = document.getElementById('progressBar');
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    document.getElementById('cycleNext').innerText = state.uninterruptedMode
+        ? 'En attente AdStopped'
+        : '—';
 
     //watchdog 30s — détecte uniquement les cas où RS.init() ne répond jamais (réseau mort, player crash, placement invalide sans noad).
     if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
@@ -802,7 +825,12 @@ function finalizeCycle(result) {
     localStorage.setItem('qa_imp_history', JSON.stringify(impHist));
     drawChart();
 
-    if (state.uninterruptedMode && !adInProgress && state.running) {
+    if (
+        state.uninterruptedMode &&
+        !adInProgress &&
+        !waitingForAdStoppedBeforeNextRefresh &&
+        state.running
+    ) {
         scheduleNextRefresh();
     }
 }
@@ -810,6 +838,7 @@ function finalizeCycle(result) {
 function settleCurrentCycleAsNoImp(reason) {
     if (cycleSettled || cycleImpCount > 0) return;
     cycleSettled = true;
+    waitingForAdStoppedBeforeNextRefresh = false;
     if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
     state.noimp++;
     saveState(); updateStats();
@@ -827,6 +856,7 @@ function scheduleNextRefresh() {
     const nextAt = new Date(Date.now() + state.interval * 1000);
     document.getElementById('cycleNext').innerText =
         nextAt.toLocaleTimeString('fr-FR') + ` (dans ${state.interval}s)`;
+    setStatus('running', 'Prochain refresh dans ' + state.interval + 's');
     const bar = document.getElementById('progressBar');
     bar.style.transition='none'; bar.style.width='0%';
     setTimeout(() => { bar.style.transition=`width ${state.interval}s linear`; bar.style.width='100%'; }, 100);

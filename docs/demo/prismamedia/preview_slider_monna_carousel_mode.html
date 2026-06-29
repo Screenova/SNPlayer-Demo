@@ -3,13 +3,13 @@
 
 <head>
 	<meta name="viewport" content="width=device-width" />
-	<title>RetailSpot Monna PREVIEW</title>
+	<title>Screenova Monna PREVIEW</title>
 	<style>
 		body {
 			margin: 0px;
 			padding: 0px;
 			font-family: Arial, sans-serif;
-			background-color: #e6f6fe;
+			background-color: #5a95a2;
 		}
 
 		#header {
@@ -46,13 +46,15 @@
 			background-color: white
 		}
 	</style>
+  <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
 </head>
 
 <body>
 
 	<div id="header">
 		<img id="logo"
-			src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+			src="https://screenova.cloud/logo.png"
 			alt="Logo">
 		<h1>PREVIEW format Monna in Slider with carousel on PrismaMedia</h1>
 		<p>Format is show at the bottom left of the page.
@@ -72,12 +74,12 @@
 			<pre>
 				<code id="codecontent">
 var s = document.createElement(&quot;script&quot;);
-s.src = &quot;https://static.retailspotads.com/rsplayer.js&quot;;
+s.src = &quot;https://static.screenova.cloud/snplayer.js&quot;;
 s.onload = function () {
-	const RS = window.RetailSpot;
+	const SN = window.Screenova;
 
-	const RetailSpotConfig = {
-		placement: 'eq-609785-2011248-141761',
+	const ScreenovaConfig = {
+		placement: '6a3a43656ad3c657d3f8cc33',
 		partnerId: '644250',
 		width: 280,
 		height: 400,
@@ -94,15 +96,15 @@ s.onload = function () {
 		}
 	}
 
-	RS.init(RetailSpotConfig, (ad) => {
+	SN.init(ScreenovaConfig, (ad) => {
 		if (ad && ad.subscribe){
-			ad.subscribe(() => RS.tools.track(&quot;%%CLICK_URL_UNESC%%&quot;), RS.VPAID_EVENTS.AdClickThru);
+			ad.subscribe(() => SN.tools.track(&quot;%%CLICK_URL_UNESC%%&quot;), SN.VPAID_EVENTS.AdClickThru);
 		  ad.subscribe(() => {
 				if(window.top.coreAds){
-					window.top.coreAds.refreshDisplaySlot(&quot;%%PATTERN:slotCode%%&quot;, { origine: &quot;RetailSpot&quot;});
-					window.top.document.getElementById(&quot;core-ads-footer-web&quot;).style.setProperty("display", "block"); 
+					window.top.coreAds.refreshDisplaySlot(&quot;%%PATTERN:slotCode%%&quot;, { origine: &quot;Screenova&quot;});
+					window.top.document.getElementById(&quot;core-ads-footer-web&quot;).style.setProperty("display", "block");
 				}
-			}, RS.VPAID_EVENTS.AdError);	
+			}, SN.VPAID_EVENTS.AdError);
 		}
 	});
 }
@@ -113,9 +115,9 @@ document.body.appendChild(s);
 		</div>
 
 		<div class="instructions">
-			Prisma Monna PREVIEW placement id : <b>eq-609785-2011248-141761</b><br />
+			Prisma Monna PREVIEW placement id : <b>6a3a43656ad3c657d3f8cc33</b><br />
 			Prisma Partner id : <b>644250</b><br />
-			RetailSpot Player version : <span id="rs-version">644250</span>
+			Screenova Player version : <span id="sn-version">644250</span>
 		</div>
 	</div>
 	<div>
@@ -136,13 +138,13 @@ document.body.appendChild(s);
 
 
 		var s = document.createElement("script");
-		s.src = "https://static.retailspotads.com/rsplayer.js";
+		s.src = "https://static.screenova.cloud/snplayer.js";
 		s.onload = function () {
-			const RS = window.RetailSpot;
-			document.getElementById("rs-version").innerText = RS.version;
+			const SN = window.Screenova;
+			document.getElementById("sn-version").innerText = SN.version;
 
-			const RetailSpotConfig = {
-				placement: "eq-609785-2011248-141761",
+			const ScreenovaConfig = {
+				placement: "6a3a43656ad3c657d3f8cc33",
 				partnerId: '644250',
 				width: 280,
 				height: 400,
@@ -154,17 +156,17 @@ document.body.appendChild(s);
 				collapseButton: true,
 				vmargin: 100, // default is 30
 				widget: "monna",
-				// native template can be customized here 
-				//template: '<div style="width:100%;height:100%;"><img src="" style="width:100%;height:100%;" class="rs-el-img"/></div>',
+				// native template can be customized here
+				//template: '<div style="width:100%;height:100%;"><img src="" style="width:100%;height:100%;" class="sn-el-img"/></div>',
 				mobile: {
 					width: 360,
 					height: 290,
 				}
 			}
 
-			RS.init(RetailSpotConfig, (ad) => {
+			SN.init(ScreenovaConfig, (ad) => {
 				if (ad && ad.subscribe) {
-					ad.subscribe(() => RS.tools.track("http://fakepxl.retailspot.org"), RS.VPAID_EVENTS.AdClickThru);
+					ad.subscribe(() => SN.tools.track("http://fakepxl.screenova.cloud"), SN.VPAID_EVENTS.AdClickThru);
 				}
 
 			});

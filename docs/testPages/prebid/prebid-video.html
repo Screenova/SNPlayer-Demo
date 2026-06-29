@@ -17,7 +17,7 @@ parameters: [Placement, Env, Width, Height]
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../assets/test_page.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="https://screenova.cloud/logo.png" />
     
     <script async src="//www.googletagservices.com/tag/js/gpt.js"></script>
     <script async src="prebid.js"></script>
@@ -27,7 +27,7 @@ parameters: [Placement, Env, Width, Height]
         window.location.search.toLowerCase()
       );
       let env = urlParams.get("env") || "";
-      let placement = urlParams.get("placement") || "686fb0737270f6fecf7bc8e3";
+      let placement = urlParams.get("placement") || (env === "preprod" ? "6a313c955244dec81823bde9" : "6a3a43656ad3c657d3f8cc33");
       let context = urlParams.get("context") || "outstream";
       var width = parseInt(urlParams.get("width") || 300);
       var height = parseInt(urlParams.get("height") || 250);
@@ -105,7 +105,9 @@ parameters: [Placement, Env, Width, Height]
         });
       });
     </script>
-  </head>
+    <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
+</head>
   <body>
     <div class="jumbotron">
       <div class="container">

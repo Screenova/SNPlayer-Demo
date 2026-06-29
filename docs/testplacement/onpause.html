@@ -3,7 +3,7 @@
 
 <head>
     <link rel="icon" sizes="192x192"
-        href="https://static.wixstatic.com/media/76251e_72b1a5226cdf4a119ee0b10c26a3c5e9%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/76251e_72b1a5226cdf4a119ee0b10c26a3c5e9%7Emv2.png"
+        href="https://screenova.cloud/logo.png"
         type="image/png">
     <script src='../demo/jwplayer/lib/jw-8.24.3/jwplayer.js'></script>
 
@@ -17,6 +17,8 @@
             display: none;
         }
     </style>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
@@ -37,7 +39,7 @@
         </div>
     </div>
     <div>
-        <h2>placement: <span id="placement-display">eq-609785-2011248-133910</span></h2>
+        <h2>placement: <span id="placement-display">6a3a43656ad3c657d3f8cc33</span></h2>
         <h3>env: <span id="env-display">prod</span></h3>
     </div>
     <div id="player">Loading the player...</div>
@@ -72,13 +74,17 @@
         document.getElementById("env-select").value = env;
         document.getElementById("env-display").innerText = env;
 
-        var placement = findGetParameter("placement") || "eq-609785-2011248-133910";
+        var testPlacements = {
+            prod: "6a3a43656ad3c657d3f8cc33",
+            preprod: "6a313c955244dec81823bde9"
+        };
+        var placement = findGetParameter("placement") || testPlacements[env] || testPlacements.prod;
         document.getElementById("placement-select").value = placement;
         document.getElementById("placement-display").innerText = placement;
 
-        var endpoint = "//static.retailspotads.com/rsplayer-jwplugin.js";
+        var endpoint = "https://static.screenova.cloud/snplayer.js";
         if (findGetParameter("env") === "preprod") {
-            endpoint = "//static-preprod.retailspotads.com/rsplayer-jwplugin.js";
+            endpoint = "https://static-preprod.screenova.cloud/snplayer.js";
         }
 
         const plugins = [];
@@ -106,11 +112,11 @@
         const player = jwplayer('player').setup({
             width: 780,
             height: 438,
-            file: 'https://retailspot.github.io/RSPlayer-Demo/resources/umbrella.mp4',
+            file: '../resources/umbrella.mp4',
             plugins: plugins
         });
 
-        window.RSShowSetting = () => {
+        window.SNShowSetting = () => {
             Array.from(document.getElementsByClassName("setting")).forEach(el => {
                 el.style.display = "block";
             });

@@ -63,7 +63,7 @@
             padding: 10px;
             cursor: pointer;
             border: none;
-            background: #007bff;
+            background: #5a95a2;
             color: white;
         }
 
@@ -80,7 +80,7 @@
             height: 100%;
             border: none;
         }
-        
+
         #overlay {
           pointer-events: none;
           position: absolute;
@@ -90,7 +90,9 @@
           top:0px;
         }
     </style>
-    <script type="text/javascript" src="https://static.retailspotads.com/rsplayer.js"></script>
+    <script type="text/javascript" src="https://static.screenova.cloud/snplayer.js"></script>
+  <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
 </head>
 <body>
 
@@ -148,7 +150,7 @@
 
     <script>
         function getVast() {
-          const template = '<VAST version="2.0"><Ad id="demoId"><InLine><AdSystem>RetailSpot</AdSystem><AdTitle><![CDATA[ DEMO ]]></AdTitle><Creatives><Creative id="727435745" sequence="1"><Linear><Duration>00:00:20</Duration><MediaFiles><MediaFile delivery="progressive" bitrate="697" width="640" height="360" type="video/mp4" scalable="true" maintainAspectRatio="true"><![CDATA[ $videoUrl$ ]]></MediaFile></MediaFiles></Linear></Creative></Creatives><Extensions><Extension type="RSNativeAd"><Title><![CDATA[ $title$ ]]></Title><Price><![CDATA[ $price$ ]]></Price><Description><![CDATA[ $description$ ]]></Description><CtaText><![CDATA[  ]]></CtaText><Domain><![CDATA[  ]]></Domain><ImageUrl><![CDATA[ $imgUrl$ ]]></ImageUrl><BrandLogoUrl><![CDATA[ $brandLogoUrl$ ]]></BrandLogoUrl></Extension></Extensions></InLine></Ad></VAST>';
+          const template = '<VAST version="2.0"><Ad id="demoId"><InLine><AdSystem>Screenova</AdSystem><AdTitle><![CDATA[ DEMO ]]></AdTitle><Creatives><Creative id="727435745" sequence="1"><Linear><Duration>00:00:20</Duration><MediaFiles><MediaFile delivery="progressive" bitrate="697" width="640" height="360" type="video/mp4" scalable="true" maintainAspectRatio="true"><![CDATA[ $videoUrl$ ]]></MediaFile></MediaFiles></Linear></Creative></Creatives><Extensions><Extension type="RSNativeAd"><Title><![CDATA[ $title$ ]]></Title><Price><![CDATA[ $price$ ]]></Price><Description><![CDATA[ $description$ ]]></Description><CtaText><![CDATA[  ]]></CtaText><Domain><![CDATA[  ]]></Domain><ImageUrl><![CDATA[ $imgUrl$ ]]></ImageUrl><BrandLogoUrl><![CDATA[ $brandLogoUrl$ ]]></BrandLogoUrl></Extension></Extensions></InLine></Ad></VAST>';
 
           const macros =['videoUrl', 'title', 'price', 'description', 'imgUrl', 'brandLogoUrl'];
           let vast = template;
@@ -186,7 +188,7 @@
             params.set("widget", document.getElementById("widget").value);
             params.set("mh", document.getElementById("mh").value);
             params.set("mv", document.getElementById("mv").value);
-            params.set("rsp_debug", "true");
+            params.set("snp_debug", "true");
 
             const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
             if(copy) {
@@ -198,9 +200,9 @@
         }
 
         function startAd(config) {
-          const RS = window.RetailSpot;
+          const SN = window.Screenova;
 
-          const RetailSpotConfig = {
+          const ScreenovaConfig = {
             vast:getVast(),
             partnerId:'349693',
             positionSelector:'#overlay',
@@ -208,8 +210,8 @@
             hideButtons: 3000,
             autoroll: 6000,
             widget: "monna",
-            // native template can be customized here 
-            //template: '<div style="width:100%;height:100%;"><img src="" style="width:100%;height:100%;" class="rs-el-img"/></div>',
+            // native template can be customized here
+            //template: '<div style="width:100%;height:100%;"><img src="" style="width:100%;height:100%;" class="sn-el-img"/></div>',
             mobile: {
               width: 360,
               height: 290,
@@ -217,7 +219,7 @@
             ...config
           }
 
-          RS.init(RetailSpotConfig);
+          SN.init(ScreenovaConfig);
         }
 
         function applyConfig() {

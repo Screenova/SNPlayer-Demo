@@ -3,7 +3,7 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>RetailSpot test page</title>
+	<title>Screenova test page</title>
 	<style type="text/css">
 		.fake-text {
 			color: gray;
@@ -26,14 +26,16 @@
 	</style>
 	<script src="//acdn.adnxs.com/cmp/cmp.complete.bundle.js" async></script>
 
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body oncontextmenu="return false;">
-	<h1>RetailSpot player test page</h1>
+	<h1>Screenova player test page</h1>
 	<div>
 		Test config:
 		<ul>
-			<li>RSPlayer version: <b><span id="rsp-version"></span></b></li>
+			<li>SNPlayer version: <b><span id="snp-version"></span></b></li>
 
 		</ul>
 	</div>
@@ -47,7 +49,7 @@
 		</div>
 		<div class="setting">
 			<b>Placement Id:</b>
-			<input id="placement" type="text" style="width:100%;" value="eq-609785-1856964-125119" />
+			<input id="placement" type="text" style="width:100%;" value="6a3a43656ad3c657d3f8cc33" />
 		</div>
 		<div class="setting">
 			<button onclick="changeTest()">APPLY</button>
@@ -156,18 +158,18 @@
 		document.getElementById("format-select").value = adformat;
 
 
-		var placement = findGetParameter("placement") || "68c043cb3a9a482fc805336a";
+		var placement = findGetParameter("placement") || "6a3a43656ad3c657d3f8cc33";
 		document.getElementById("placement").value = placement;
 
 
 		var s = document.createElement("script");
-		s.src = "https://static.retailspotads.com/rsplayer.js";
+		s.src = "https://static.screenova.cloud/snplayer.js";
 		s.onload = function () {
-			const RS = window.RetailSpot;
+			const SN = window.Screenova;
 
-			document.getElementById("rsp-version").innerText = RS.version;
+			document.getElementById("snp-version").innerText = SN.version;
 
-			const RetailSpotConfig = {
+			const ScreenovaConfig = {
 				placement,
 				width: 580,
 				height: 320,
@@ -180,10 +182,10 @@
 				//anim: "top" // default is 'auto': minimal distance animation
 			}
 
-			RS.init(RetailSpotConfig, function (creative) {
+			SN.init(ScreenovaConfig, function (creative) {
 				creative.subscribe(function () {
-					console.log("RSPlayer: AdLoaded!");
-				}, RS.VPAID_EVENTS.AdLoaded);
+					console.log("SNPlayer: AdLoaded!");
+				}, SN.VPAID_EVENTS.AdLoaded);
 			});
 		}
 		document.body.appendChild(s);

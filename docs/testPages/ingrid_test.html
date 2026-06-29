@@ -3,7 +3,7 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>RetailSpot Ingrid test page</title>
+	<title>Screenova Ingrid test page</title>
 	<style type="text/css">
 		.grid {
 			width: 900px;
@@ -82,14 +82,16 @@
 	</style>
 	<script src="//acdn.adnxs.com/cmp/cmp.complete.bundle.js" async></script>
 
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body oncontextmenu="return false;">
-	<h1>RetailSpot player Ingrid test page</h1>
+	<h1>Screenova player Ingrid test page</h1>
 	<div>
 		Test config:
 		<ul>
-			<li>RSPlayer version: <b><span id="rsp-version"></span></b></li>
+			<li>SNPlayer version: <b><span id="snp-version"></span></b></li>
 
 		</ul>
 	</div>
@@ -288,7 +290,7 @@
 		}
 
 
-		var endpoint = findGetParameter("env") || "https://static-preprod.retailspotads.com/rsplayer.js";
+		var endpoint = findGetParameter("env") || "https://static-preprod.screenova.cloud/snplayer.js";
 		var size = findGetParameter("size") || "3";
 		var align = findGetParameter("align") || "left";
 		var mode = findGetParameter("mode") || "aside-left";
@@ -298,15 +300,17 @@
 		document.getElementById("mode-select").value = mode;
 
 
+		var placement = endpoint.indexOf("-preprod") !== -1 ? "6a313c955244dec81823bde9" : "6a3a43656ad3c657d3f8cc33";
+
 		var s = document.createElement("script");
-		s.src = "https://static.retailspotads.com/rsplayer.js";
+		s.src = endpoint;
 		s.onload = function () {
-			const RS = window.RetailSpot;
+			const SN = window.Screenova;
 
-			document.getElementById("rsp-version").innerText = RS.version;
+			document.getElementById("snp-version").innerText = SN.version;
 
-			const RetailSpotConfig = {
-				placement: '68c043cb3a9a482fc805336a',
+			const ScreenovaConfig = {
+				placement: placement,
 				format: "ingrid",
 				align: align,
 				ingridSize: size,
@@ -314,10 +318,10 @@
 				sponsoredLabel: false,
 			}
 
-			RS.init(RetailSpotConfig, function (creative) {
+			SN.init(ScreenovaConfig, function (creative) {
 				creative.subscribe(function () {
-					console.log("RSPlayer: AdLoaded!");
-				}, RS.VPAID_EVENTS.AdLoaded);
+					console.log("SNPlayer: AdLoaded!");
+				}, SN.VPAID_EVENTS.AdLoaded);
 			});
 		}
 		document.body.appendChild(s);

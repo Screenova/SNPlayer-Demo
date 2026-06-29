@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RetailSpot sample player</title>
+  <title>Screenova sample player</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background-color: #e6f6fe;
+      background-color: #5a95a2;
     }
 
     #header {
@@ -39,14 +39,16 @@
       height: 100%;
     }
   </style>
-  <script type="text/javascript" src="https://static.retailspotads.com/rsplayer.js"></script>
+  <script type="text/javascript" src="https://static.screenova.cloud/snplayer.js"></script>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
 
   <div id="header">
     <img id="logo"
-      src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+      src="https://screenova.cloud/logo.png"
       alt="Logo">
     <h1>Oustream simple example</h1>
   </div>
@@ -56,8 +58,8 @@
   </div>
 
   <script>
-    const RetailSpotConfig = {
-      placement: '68d3fb9c8810d9660b51c90f',
+    const ScreenovaConfig = {
+      placement: '6a3a43656ad3c657d3f8cc33',
       width: '100%',
       height: '100%',
       positionSelector: "#target",
@@ -66,16 +68,16 @@
       }
     }
 
-    window.RetailSpot.init(RetailSpotConfig, function (creative) {
+    window.Screenova.init(ScreenovaConfig, function (creative) {
       creative.subscribe(function () {
-        console.log("RSPlayer: AdLoaded!");
-      }, window.RetailSpot.VPAID_EVENTS.AdLoaded);
+        console.log("SNPlayer: AdLoaded!");
+      }, window.Screenova.VPAID_EVENTS.AdLoaded);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdStopped!");
-      }, window.RetailSpot.VPAID_EVENTS.AdStopped);
+        console.log("SNPlayer: AdStopped!");
+      }, window.Screenova.VPAID_EVENTS.AdStopped);
       creative.subscribe(function () {
-        console.log("RSPlayer: Skip button clicked!");
-      }, window.RetailSpot.VPAID_EVENTS.AdSkipped);
+        console.log("SNPlayer: Skip button clicked!");
+      }, window.Screenova.VPAID_EVENTS.AdSkipped);
     });
   </script>
 

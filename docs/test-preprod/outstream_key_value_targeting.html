@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background-color: #e6f6fe;
+      background-color: #5a95a2;
     }
 
     #header {
@@ -39,14 +39,16 @@
       height: 200px;
     }
   </style>
-  <script type="text/javascript" src="https://static-preprod.retailspotads.com/rsplayer.js"></script>
+  <script type="text/javascript" src="https://static-preprod.screenova.cloud/snplayer.js"></script>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
 
   <div id="header" style="display: flex; flex-direction: row; align-items: center;justify-content:center;">
     <img id="logo"
-      src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+      src="https://screenova.cloud/logo.png"
       alt="Logo">
     <h1>Oustream with KeyValue targeting example</h1>
   </div>
@@ -59,14 +61,14 @@
     <div class="videoContainer">
       <p><b>key value:   "crea" = "iphone"</b></p>
       <div id="target2"></div>
-    </div>  
+    </div>
   </div>
 
 
   <script>
 
-    window.RetailSpot.init({
-      placement: '68d50c2c19d2c0608f8bc9c8',
+    window.Screenova.init({
+      placement: '6a313c955244dec81823bde9',
       width: '100%',
       height: '100%',
       positionSelector: "#target",
@@ -78,8 +80,8 @@
     });
 
 
-    window.RetailSpot.init({
-      placement: '68d50c2c19d2c0608f8bc9c8',
+    window.Screenova.init({
+      placement: '6a313c955244dec81823bde9',
       width: '100%',
       height: '100%',
       positionSelector: "#target2",

@@ -1,0 +1,300 @@
+:root {
+  --sn-primary: #5a95a2;
+  --sn-primary-dark: #3f7480;
+  --sn-bg: #eef6f7;
+  --sn-bg-soft: #f8fbfc;
+  --sn-surface: #ffffff;
+  --sn-text: #1c2e33;
+  --sn-muted: #62767c;
+  --sn-border: rgba(45, 82, 90, 0.18);
+  --sn-shadow: 0 14px 38px rgba(34, 68, 76, 0.12);
+}
+
+html {
+  background: var(--sn-bg);
+}
+
+body.screenova-doc {
+  box-sizing: border-box;
+  min-height: 100vh !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 24px 48px !important;
+  display: block !important;
+  align-items: initial !important;
+  justify-content: initial !important;
+  color: var(--sn-text) !important;
+  background:
+    linear-gradient(180deg, rgba(90, 149, 162, 0.16), rgba(238, 246, 247, 0.92) 260px),
+    var(--sn-bg) !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+body.screenova-doc *,
+body.screenova-doc *::before,
+body.screenova-doc *::after {
+  box-sizing: border-box;
+}
+
+.screenova-topbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 132px;
+  margin: 0 -24px 32px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--sn-border);
+  box-shadow: 0 8px 24px rgba(34, 68, 76, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.screenova-topbar__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(1120px, 100%);
+  text-align: center;
+}
+
+.screenova-topbar__logo {
+  display: block;
+  width: auto;
+  height: 44px;
+  max-width: min(240px, 70vw);
+  object-fit: contain;
+}
+
+.screenova-topbar__copy {
+  max-width: 920px;
+  margin-top: 16px;
+}
+
+.screenova-topbar__copy:empty {
+  display: none;
+}
+
+body.screenova-doc .screenova-topbar__copy h1,
+body.screenova-doc .screenova-topbar__copy h2,
+body.screenova-doc .screenova-topbar__copy h3 {
+  margin: 0 !important;
+  color: var(--sn-text) !important;
+}
+
+body.screenova-doc .screenova-topbar__copy h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.1;
+}
+
+body.screenova-doc .screenova-topbar__copy h2,
+body.screenova-doc .screenova-topbar__copy h3 {
+  margin-top: 8px !important;
+  color: var(--sn-muted) !important;
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 600;
+}
+
+body.screenova-doc .screenova-legacy-logo {
+  display: none !important;
+}
+
+body.screenova-doc .screenova-empty-header {
+  display: none !important;
+}
+
+body.screenova-doc > :not(script):not(style):not(.screenova-topbar) {
+  max-width: min(1280px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.screenova-doc h1,
+body.screenova-doc h2,
+body.screenova-doc h3 {
+  color: var(--sn-text) !important;
+  letter-spacing: 0;
+}
+
+body.screenova-doc h1 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.12;
+}
+
+body.screenova-doc h2,
+body.screenova-doc h3 {
+  line-height: 1.2;
+}
+
+body.screenova-doc a {
+  color: var(--sn-primary-dark);
+}
+
+body.screenova-doc #header,
+body.screenova-doc .settings,
+body.screenova-doc .setting,
+body.screenova-doc .settings-section,
+body.screenova-doc .panel,
+body.screenova-doc .container,
+body.screenova-doc .fake-text,
+body.screenova-doc #code,
+body.screenova-doc pre,
+body.screenova-doc table,
+body.screenova-doc .grid-item {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid var(--sn-border) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--sn-shadow);
+  color: var(--sn-text) !important;
+}
+
+body.screenova-doc #header,
+body.screenova-doc .settings,
+body.screenova-doc .panel,
+body.screenova-doc .container,
+body.screenova-doc .fake-text,
+body.screenova-doc #code,
+body.screenova-doc pre {
+  padding: 22px !important;
+  margin-bottom: 24px !important;
+}
+
+body.screenova-doc .setting,
+body.screenova-doc .settings-section {
+  padding: 14px !important;
+  margin: 10px 0 !important;
+  box-shadow: none;
+}
+
+body.screenova-doc .grid {
+  display: flow-root;
+  width: min(100%, 980px) !important;
+}
+
+body.screenova-doc .grid-item {
+  padding: 10px !important;
+}
+
+body.screenova-doc #videoContainer,
+body.screenova-doc #video-container,
+body.screenova-doc #player,
+body.screenova-doc #test_ad_div,
+body.screenova-doc .ad-slot,
+body.screenova-doc video,
+body.screenova-doc iframe {
+  max-width: 100% !important;
+  border-radius: 8px !important;
+  outline: 1px solid var(--sn-border);
+  box-shadow: var(--sn-shadow);
+  background: var(--sn-surface);
+}
+
+body.screenova-doc #videoContainer,
+body.screenova-doc #video-container {
+  overflow: hidden;
+}
+
+body.screenova-doc input,
+body.screenova-doc select,
+body.screenova-doc textarea {
+  min-height: 38px;
+  padding: 8px 10px;
+  color: var(--sn-text);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: 8px;
+  outline: none;
+}
+
+body.screenova-doc input[type="checkbox"],
+body.screenova-doc input[type="radio"] {
+  min-height: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  accent-color: var(--sn-primary);
+}
+
+body.screenova-doc input:focus,
+body.screenova-doc select:focus,
+body.screenova-doc textarea:focus {
+  border-color: var(--sn-primary);
+  box-shadow: 0 0 0 3px rgba(90, 149, 162, 0.18);
+}
+
+body.screenova-doc button,
+body.screenova-doc .button {
+  min-height: 40px;
+  padding: 9px 16px !important;
+  color: #ffffff !important;
+  background: var(--sn-primary) !important;
+  border: 1px solid var(--sn-primary-dark) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 20px rgba(90, 149, 162, 0.22);
+  cursor: pointer;
+}
+
+body.screenova-doc button:hover,
+body.screenova-doc .button:hover,
+body.screenova-doc .button.selected {
+  background: var(--sn-primary-dark) !important;
+}
+
+body.screenova-doc table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+body.screenova-doc th,
+body.screenova-doc td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--sn-border);
+}
+
+body.screenova-doc th {
+  color: var(--sn-text);
+  background: rgba(90, 149, 162, 0.12);
+}
+
+body.screenova-doc pre,
+body.screenova-doc code {
+  white-space: pre-wrap;
+}
+
+body.screenova-doc .fake-text {
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  body.screenova-doc {
+    padding: 0 12px 32px !important;
+  }
+
+  .screenova-topbar {
+    min-height: 104px;
+    margin: 0 -12px 24px;
+    padding: 18px 12px;
+  }
+
+  .screenova-topbar__logo {
+    height: 36px;
+  }
+
+  .screenova-topbar__copy {
+    margin-top: 12px;
+  }
+
+  body.screenova-doc #header,
+  body.screenova-doc .settings,
+  body.screenova-doc .panel,
+  body.screenova-doc .container,
+  body.screenova-doc .fake-text,
+  body.screenova-doc #code,
+  body.screenova-doc pre {
+    padding: 16px !important;
+  }
+}

@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RetailSpot sample player</title>
+  <title>Screenova sample player</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background-color: #e6f6fe;
+      background-color: #5a95a2;
     }
 
     #header {
@@ -39,14 +39,16 @@
       height: 100%;
     }
   </style>
-  <script type="text/javascript" src="https://static-preprod.retailspotads.com/rsplayer.js"></script>
+  <script type="text/javascript" src="https://static-preprod.screenova.cloud/snplayer.js"></script>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
 
   <div id="header">
     <img id="logo"
-      src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+      src="https://screenova.cloud/logo.png"
       alt="Logo">
     <h1>Oustream simple example</h1>
   </div>
@@ -59,15 +61,15 @@
 
 
   <script>
-    const RetailSpotConfig = {
-      placement: '6971f8a4728826790bab1284',
+    const ScreenovaConfig = {
+      placement: '6a313c955244dec81823bde9',
       width: '100%',
       height: '100%',
       positionSelector: "#target",
       autoplay:false
     }
 
-    window.RetailSpot.init(RetailSpotConfig, function (creative) {
+    window.Screenova.init(ScreenovaConfig, function (creative) {
       const startAdButton = document.getElementById('startAdButton');
       let startAdRequested = false;
       startAdButton.addEventListener('click', function () {
@@ -77,33 +79,33 @@
       });
 
       creative.subscribe(function () {
-        console.log("RSPlayer: AdLoaded!");
+        console.log("SNPlayer: AdLoaded!");
         startAdButton.disabled = false;
-      }, window.RetailSpot.VPAID_EVENTS.AdLoaded);
+      }, window.Screenova.VPAID_EVENTS.AdLoaded);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdStarted!");
-      }, window.RetailSpot.VPAID_EVENTS.AdStarted);
+        console.log("SNPlayer: AdStarted!");
+      }, window.Screenova.VPAID_EVENTS.AdStarted);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdPlaying!");
-      }, window.RetailSpot.VPAID_EVENTS.AdPlaying);
+        console.log("SNPlayer: AdPlaying!");
+      }, window.Screenova.VPAID_EVENTS.AdPlaying);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdStopped!");
-      }, window.RetailSpot.VPAID_EVENTS.AdStopped);
+        console.log("SNPlayer: AdStopped!");
+      }, window.Screenova.VPAID_EVENTS.AdStopped);
       creative.subscribe(function () {
-        console.log("RSPlayer: Skip button clicked!");
-      }, window.RetailSpot.VPAID_EVENTS.AdSkipped);
+        console.log("SNPlayer: Skip button clicked!");
+      }, window.Screenova.VPAID_EVENTS.AdSkipped);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdVideoFirstQuartile!");
-      }, window.RetailSpot.VPAID_EVENTS.AdVideoFirstQuartile);
+        console.log("SNPlayer: AdVideoFirstQuartile!");
+      }, window.Screenova.VPAID_EVENTS.AdVideoFirstQuartile);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdVideoMidpoint!");
-      }, window.RetailSpot.VPAID_EVENTS.AdVideoMidpoint);
+        console.log("SNPlayer: AdVideoMidpoint!");
+      }, window.Screenova.VPAID_EVENTS.AdVideoMidpoint);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdVideoThirdQuartile!");
-      }, window.RetailSpot.VPAID_EVENTS.AdVideoThirdQuartile);
+        console.log("SNPlayer: AdVideoThirdQuartile!");
+      }, window.Screenova.VPAID_EVENTS.AdVideoThirdQuartile);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdVideoComplete!");
-      }, window.RetailSpot.VPAID_EVENTS.AdVideoComplete);
+        console.log("SNPlayer: AdVideoComplete!");
+      }, window.Screenova.VPAID_EVENTS.AdVideoComplete);
     });
   </script>
 </body>

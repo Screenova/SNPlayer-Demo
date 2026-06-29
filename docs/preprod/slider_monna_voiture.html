@@ -3,13 +3,13 @@
 
 <head>
 	<meta name="viewport" content="width=device-width" />
-	<title>RetailSpot Monna PREVIEW</title>
+	<title>Screenova Monna PREVIEW</title>
 	<style>
 		body {
 			margin: 0px;
 			padding: 0px;
 			font-family: Arial, sans-serif;
-			background-color: #e6f6fe;
+			background-color: #5a95a2;
 		}
 
 		#header {
@@ -46,13 +46,15 @@
 			background-color: white
 		}
 	</style>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
 
 	<div id="header">
 		<img id="logo"
-			src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+			src="https://screenova.cloud/logo.png"
 			alt="Logo">
 		<h1>PREVIEW format Monna in Slider with carousel on PrismaMedia</h1>
 		<p>Format is show at the bottom left of the page.
@@ -73,12 +75,12 @@
 				<code id="codecontent">
 
 		var s = document.createElement(&quot;script&quot;);
-		s.src = &quot;https://static-preprod.retailspotads.com/rsplayer.js&quot;;
+		s.src = &quot;https://static-preprod.screenova.cloud/snplayer.js&quot;;
 		s.onload = function () {
-			const RS = window.RetailSpot;
+			const SN = window.Screenova;
 
-			const RetailSpotConfig = {
-				placement: &quot;686fb0737270f6fecf7bc8e3&quot;,
+			const ScreenovaConfig = {
+				placement: &quot;6a313c955244dec81823bde9&quot;,
 				partnerId: '644250',
 				width: 200,
 				height: 340,
@@ -95,7 +97,7 @@
 				}
 			}
 
-			RS.init(RetailSpotConfig);
+			SN.init(ScreenovaConfig);
 		}
 		document.body.appendChild(s);
 				</code>
@@ -104,7 +106,7 @@
 		</div>
 
 		<div class="instructions">
-			Prisma Monna PREVIEW placement id : <b>686fb0737270f6fecf7bc8e3</b><br />
+			Prisma Monna PREVIEW placement id : <b>6a313c955244dec81823bde9</b><br />
 			Prisma Partner id : <b>644250</b>
 		</div>
 	</div>
@@ -124,12 +126,12 @@
 	<script type="text/javascript">
 
 		var s = document.createElement("script");
-		s.src = "https://static-preprod.retailspotads.com/rsplayer.js";
+		s.src = "https://static-preprod.screenova.cloud/snplayer.js";
 		s.onload = function () {
-			const RS = window.RetailSpot;
+			const SN = window.Screenova;
 
-			const RetailSpotConfig = {
-				placement: "686fb0737270f6fecf7bc8e3",
+			const ScreenovaConfig = {
+				placement: "6a313c955244dec81823bde9",
 				partnerId: '644250',
 				width: 200,
 				height: 340,
@@ -140,15 +142,15 @@
 				collapseButton: true,
 				vmargin: 60, // default is 30
 				widget: "monna",
-				// native template can be customized here 
-				//template: '<div style="width:100%;height:100%;"><img src="" style="width:100%;height:100%;" class="rs-el-img"/></div>',
+				// native template can be customized here
+				//template: '<div style="width:100%;height:100%;"><img src="" style="width:100%;height:100%;" class="sn-el-img"/></div>',
 				mobile: {
 					width: 360,
 					height: 290,
 				}
 			}
 
-			RS.init(RetailSpotConfig);
+			SN.init(ScreenovaConfig);
 		}
 		document.body.appendChild(s);
 	</script>

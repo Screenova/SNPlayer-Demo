@@ -2,24 +2,24 @@
 <html>
 
   <head>
-      <link rel="icon" type="image/png" href="/favicon.png">
+      <link rel="icon" type="image/png" href="https://screenova.cloud/logo.png">
       <style>
         body {
           margin: 0;
           padding: 0;
           font-family: Arial, sans-serif;
-          background-color: #e6f6fe;
+          background-color: #5a95a2;
         }
-    
+
         #header {
           text-align: center;
           padding: 20px;
         }
-    
+
         #logo {
           max-width: 275px;
         }
-    
+
         #section-back {
           display: none;
           width:100%;
@@ -34,7 +34,7 @@
           position: relative;
           overflow: hidden;
         }
-    
+
         #div-1 {
           width: 100%;
           height: 100%;
@@ -52,7 +52,7 @@
 
       <script>
 
-          
+
           var env = document.location.host.indexOf("dev") === 0 ? "dev" : "";
 
           var PREBID_TIMEOUT = 5000;
@@ -70,7 +70,7 @@
                   bids: [{
                       bidder: 'retailspot',
                       params: {
-                          placement: 'eq-609785-1856964-125234',
+                          placement: '6a3a43656ad3c657d3f8cc33',
                           format: "slider",
                           widget: "monna",
                           height: 350,
@@ -125,12 +125,14 @@
 
       </script>
 
-  </head>
+    <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
+</head>
 
   <body>
     <div id="header">
       <img id="logo"
-        src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+        src="https://screenova.cloud/logo.png"
         alt="Logo">
       <h1>Header bidding monna example</h1>
       <h2>Using Prebid.JS 9.25+</h2>
@@ -148,21 +150,21 @@
     </div>
   </div>
   <div id="code">
-    <h3>Add the RetailSpot bidder in your prebid configuration:</h3>
+    <h3>Add the Screenova bidder in your prebid configuration:</h3>
     <pre>
       <code id="codecontent">
         ...
         bids: [{
             bidder: 'retailspot',
             params: {
-              placement: 'eq-609785-1856964-125234',
+              placement: '6a3a43656ad3c657d3f8cc33',
               format: "slider",
               widget: "monna",
               height: 350,
               width: 200,
               // allows slider format to be shown outside of predib target div
               target: null,
-              // Add more rsplayer configuration here...
+              // Add more snplayer configuration here...
             }
         }]
       </code>

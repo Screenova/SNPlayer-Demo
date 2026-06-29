@@ -73,28 +73,30 @@
 
     .button.selected {
       color: white;
-      background-color: #3498db;
+      background-color: #5a95a2;
       border: 1px solid white;
     }
 
-    #rsp-version {
+    #snp-version {
       color: white;
     }
   </style>
+  <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
 </head>
 
 <body>
-  <h1 id="title">RetailSpot Instream</h1>
+  <h1 id="title">Screenova Instream</h1>
   <div class="settings">
     <div class="settings-section">
-      <b>RSPlayer version: <span id="rsp-version"></span></b>
+      <b>SNPlayer version: <span id="snp-version"></span></b>
     </div>
     <!-- <div class="settings-section">
       <b>Environment:</b>
       <select id="endpoint">
-        <option value="http://localhost:3000/dist/rsplayer-instream.js"">DEV (localhost:3000/dist/rsplayer-instream.js)</option>
-      <option value="https://static-preprod.retailspotads.com/rsplayer-instream.js"">PREPROD (static-preprod)</option>
-        <option value="https://static.retailspotads.com/rsplayer-instream.js">PROD (static)</option>
+        <option value="http://localhost:3000/dist/snplayer.js">DEV (localhost:3000/dist/snplayer.js)</option>
+      <option value="https://static-preprod.screenova.cloud/snplayer.js">PREPROD (static-preprod)</option>
+        <option value="https://static.screenova.cloud/snplayer.js">PROD (static)</option>
       </select>
     </div> -->
     <div class="settings-section">
@@ -123,7 +125,7 @@
 
   <div id="video-container">
     <video controls id="video-target" muted width="1280" height="720">
-      <source src="https://retailspot.github.io/RSPlayer-Demo/resources/noplp.mp4" type="video/mp4">
+      <source src="../../resources/noplp.mp4" type="video/mp4">
       Votre navigateur ne prend pas en charge la lecture vidéo.
     </video>
     <div class="fullscreen-button" onclick="toggleFullscreen()"></div>
@@ -169,7 +171,7 @@
       var enableCarousel = document.getElementById("carouselCheckbox").checked;
       //var endpoint = document.getElementById("endpoint").value;
 
-      document.location.href = currentUrl + "?rsp_debug=true"
+      document.location.href = currentUrl + "?snp_debug=true"
         + "&preroll=" + enablePreroll
         + "&midroll=" + enableMidroll
         + "&postroll=" + enablePostroll
@@ -202,19 +204,19 @@
     var enableCarousel = findGetParameter("carousel") === 'true';
     document.getElementById("carouselCheckbox").checked = enableCarousel;
 
-    // var endpoint = findGetParameter("env") || "http://localhost:3000/dist/rsplayer.js";
+    // var endpoint = findGetParameter("env") || "http://localhost:3000/dist/snplayer.js";
     // document.getElementById("endpoint").value = endpoint;
 
 
     var s = document.createElement("script");
-    s.src = "https://static.retailspotads.com/rsplayer-instream.js";
+    s.src = "https://static.screenova.cloud/snplayer.js";
     s.onload = function () {
-      const RS = window.RetailSpot;
+      const SN = window.Screenova;
 
-      document.getElementById("rsp-version").innerText = RS.version;
+      document.getElementById("snp-version").innerText = SN.version;
 
-      const nativeTemplate = '<div class="rs-expand" style="overflow:hidden;width:100%;color:#434748;height:100%;max-height:68px;transition:max-height .7s ease;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;box-shadow:rgba(0,0,0,.7) 0 0 20px;border-radius:8px"><div style="display:flex;flex-direction:row;height:68px"><img class="rs-hideonexpand rs-el-img" style="opacity:1;transition:opacity 0.7s ease;width:68px;height:68px;object-fit:contain" src="https://retailspot.github.io/RSPlayer-Demo/images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img src="https://retailspot.github.io/RSPlayer-Demo/resources/intermarcheLogo.png" style="width:130px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="rs-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="rs-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><img src="https://retailspot.github.io/RSPlayer-Demo/resources/intermarcheCart.png" style="padding:0 4px 0 0;width:48px;padding:4px;height:48px"></div></div><div style="display:flex;flex-direction:row;flew-grow:1"><img class="rs-el-img" style="width:50%;height:calc(100% - 68px);object-fit:contain" src="https://retailspot.github.io/RSPlayer-Demo/images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"> <img style="width:50%;height:calc(100% - 68px);object-fit:contain" src="https://retailspot.github.io/RSPlayer-Demo/resources/intermarcher-qr.png"></div></div>';
-      const nativeTemplateCarousel = '<div style="overflow:hidden;width:100%;color:#434748;height:100%;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;"><div style="display:flex;flex-direction:row;height:68px"><img class="rs-el-img" style="opacity:1;transition:opacity 0.7s ease;width:68px;height:68px;object-fit:contain" src="https://retailspot.github.io/RSPlayer-Demo/images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img src="https://retailspot.github.io/RSPlayer-Demo/resources/intermarcheLogo.png" style="width:130px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="rs-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="rs-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><div class="rs-el-closebutton" style="padding: 0px 8px; font-size: 20px; background: rgba(0, 0, 0, 0); border-radius: 0px 10px 10px 0px; transition: all 0.3s ease 0s; display: flex; flex-direction: column; justify-content: center; opacity: 1;"><span style="align-items: center; display: flex; height: 20px; justify-content: center; width: 20px;">×</span></div></div></div></div>';
+      const nativeTemplate = '<div class="sn-expand" style="overflow:hidden;width:100%;color:#434748;height:100%;max-height:68px;transition:max-height .7s ease;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;box-shadow:rgba(0,0,0,.7) 0 0 20px;border-radius:8px"><div style="display:flex;flex-direction:row;height:68px"><img class="sn-hideonexpand sn-el-img" style="opacity:1;transition:opacity 0.7s ease;width:68px;height:68px;object-fit:contain" src="../../images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img src="../../resources/intermarcheLogo.png" style="width:130px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="sn-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="sn-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><img src="../../resources/intermarcheCart.png" style="padding:0 4px 0 0;width:48px;padding:4px;height:48px"></div></div><div style="display:flex;flex-direction:row;flew-grow:1"><img class="sn-el-img" style="width:50%;height:calc(100% - 68px);object-fit:contain" src="../../images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"> <img style="width:50%;height:calc(100% - 68px);object-fit:contain" src="../../resources/intermarcher-qr.png"></div></div>';
+      const nativeTemplateCarousel = '<div style="overflow:hidden;width:100%;color:#434748;height:100%;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;"><div style="display:flex;flex-direction:row;height:68px"><img class="sn-el-img" style="opacity:1;transition:opacity 0.7s ease;width:68px;height:68px;object-fit:contain" src="../../images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img src="../../resources/intermarcheLogo.png" style="width:130px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="sn-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="sn-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><div class="sn-el-closebutton" style="padding: 0px 8px; font-size: 20px; background: rgba(0, 0, 0, 0); border-radius: 0px 10px 10px 0px; transition: all 0.3s ease 0s; display: flex; flex-direction: column; justify-content: center; opacity: 1;"><span style="align-items: center; display: flex; height: 20px; justify-content: center; width: 20px;">×</span></div></div></div></div>';
 
       const nativeData = {
         "title": "Poupée Miraculous",
@@ -222,7 +224,7 @@
         "desc": "Miraculous Poupée Marinette",
         "ctatext": "En savoir plus",
         "domain": "Intermarché",
-        "imageUrl": "https://retailspot.github.io/RSPlayer-Demo/resources/poupee_miraculous.jpg",
+        "imageUrl": "../../resources/poupee_miraculous.jpg",
         "clickUrl": "https://www.intermarche.com/",
       };
       const nativeData2 = {
@@ -236,7 +238,7 @@
       };
 
 
-      const RetailSpotConfig = {
+      const ScreenovaConfig = {
         videoElement: document.getElementById("video-target"),
         positionSelector: "#video-container",
         partnerId: "349693",
@@ -244,32 +246,32 @@
       }
 
       if (enablePreroll) {
-        RetailSpotConfig.preroll = {
-          vastUrl: "https://retailspot.github.io/RSPlayer-Demo/vast/miraculous.xml",
+        ScreenovaConfig.preroll = {
+          vastUrl: "../../vast/miraculous.xml",
         }
       }
       if (enableMidroll) {
-        RetailSpotConfig.midroll = [{
+        ScreenovaConfig.midroll = [{
           startTime: "00:00:15",
-          vastUrl: "https://retailspot.github.io/RSPlayer-Demo/vast/miraculous.xml",
+          vastUrl: "../../vast/miraculous.xml",
         }]
       }
       if (enablePostroll) {
-        RetailSpotConfig.postroll = {
-          vastUrl: "https://retailspot.github.io/RSPlayer-Demo/vast/miraculous.xml",
+        ScreenovaConfig.postroll = {
+          vastUrl: "../../vast/miraculous.xml",
         }
       }
       if (enablePauseAd && !enableCarousel) {
 
-        RetailSpotConfig.pauseroll = {
-          vastUrl: "https://retailspot.github.io/RSPlayer-Demo/vast/miraculous.xml",
+        ScreenovaConfig.pauseroll = {
+          vastUrl: "../../vast/miraculous.xml",
           format: "slider",
           videoFit: "cover",
           borderRadius: '8px',
           template: nativeTemplate
         }
       } else if (enablePauseAd) {
-        RetailSpotConfig.pauseroll = {
+        ScreenovaConfig.pauseroll = {
           multiAd: 'slider-carousel',
           itemWidth: 333,
           itemHeight: 68,
@@ -286,17 +288,17 @@
         }
       }
       if (enableNonLinearAd && !enableCarousel) {
-        RetailSpotConfig.nonlinear = {
+        ScreenovaConfig.nonlinear = {
           startTime: "00:00:03",
           maxDuration: 20000,
-          vastUrl: "https://retailspot.github.io/RSPlayer-Demo/vast/miraculous.xml",
+          vastUrl: "../../vast/miraculous.xml",
           format: "slider",
           videoFit: "cover",
           borderRadius: '8px',
           template: nativeTemplate
         }
       } else if (enableNonLinearAd) {
-        RetailSpotConfig.nonlinear = {
+        ScreenovaConfig.nonlinear = {
           startTime: "00:00:03",
           maxDuration: 15000,
           multiAd: 'slider-carousel',
@@ -315,30 +317,30 @@
         }
       }
 
-      RS.init(RetailSpotConfig, function (creative) {
+      SN.init(ScreenovaConfig, function (creative) {
         creative.subscribe(function () {
-          console.log("RSPlayer: AdLoaded!");
-        }, RS.VPAID_EVENTS.AdLoaded);
+          console.log("SNPlayer: AdLoaded!");
+        }, SN.VPAID_EVENTS.AdLoaded);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoStart!");
-        }, RS.VPAID_EVENTS.AdVideoStart);
+          console.log("SNPlayer: AdVideoStart!");
+        }, SN.VPAID_EVENTS.AdVideoStart);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoFirstQuartile!");
-        }, RS.VPAID_EVENTS.AdVideoFirstQuartile);
+          console.log("SNPlayer: AdVideoFirstQuartile!");
+        }, SN.VPAID_EVENTS.AdVideoFirstQuartile);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoMidpoint!");
-        }, RS.VPAID_EVENTS.AdVideoMidpoint);
+          console.log("SNPlayer: AdVideoMidpoint!");
+        }, SN.VPAID_EVENTS.AdVideoMidpoint);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoThirdQuartile!");
-        }, RS.VPAID_EVENTS.AdVideoThirdQuartile);
+          console.log("SNPlayer: AdVideoThirdQuartile!");
+        }, SN.VPAID_EVENTS.AdVideoThirdQuartile);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoComplete!");
-        }, RS.VPAID_EVENTS.AdVideoComplete);
+          console.log("SNPlayer: AdVideoComplete!");
+        }, SN.VPAID_EVENTS.AdVideoComplete);
       });
     }
     document.body.appendChild(s);

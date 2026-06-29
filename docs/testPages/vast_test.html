@@ -3,7 +3,7 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RetailSpot test page</title>
+  <title>Screenova test page</title>
   <style type="text/css">
     .fake-text {
       color: gray;
@@ -25,14 +25,16 @@
     }
   </style>
 
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
-  <h1>RetailSpot player test page</h1>
+  <h1>Screenova player test page</h1>
   <div>
     Test config:
     <ul>
-      <li>RSPlayer version: <b><span id="rsp-version"></span></b></li>
+      <li>SNPlayer version: <b><span id="snp-version"></span></b></li>
 
     </ul>
   </div>
@@ -41,8 +43,8 @@
       <b>Partner ID:</b>
       <input type="text" id="apikey" />
       <br />
-      <input type="checkbox" id="rsp_debug" checked disabled />
-      <label for="rsp_debug">Debug log</label>
+      <input type="checkbox" id="snp_debug" checked disabled />
+      <label for="snp_debug">Debug log</label>
     </div>
     <div class="setting">
       <button onclick="changeTest()">Update Settings</button>
@@ -235,10 +237,10 @@
 
       document.location.href = currentUrl + "?"
         + "&apikey=" + apikey
-        + "&rsp_debug=true"
+        + "&snp_debug=true"
     }
     function applyVast() {
-      const RetailSpotConfig = {
+      const ScreenovaConfig = {
         partnerId: apikey,
         vast: document.getElementById("vast").value.trim(),
         width: 320,
@@ -249,45 +251,45 @@
         autoplay: false,
       }
 
-      window.RetailSpot.init(RetailSpotConfig, function (creative) {
+      window.Screenova.init(ScreenovaConfig, function (creative) {
 
         vpaidControl = creative;
         creative.subscribe(function () {
-          console.log("RSPlayer: AdLoaded!");
-        }, window.RetailSpot.VPAID_EVENTS.AdLoaded);
+          console.log("SNPlayer: AdLoaded!");
+        }, window.Screenova.VPAID_EVENTS.AdLoaded);
 
         creative.subscribe(function (message) {
-          console.error("RSPlayer: ERROR! : " + message);
-        }, window.RetailSpot.VPAID_EVENTS.AdError);
+          console.error("SNPlayer: ERROR! : " + message);
+        }, window.Screenova.VPAID_EVENTS.AdError);
 
         creative.subscribe(function (message) {
-          console.log("RSPlayer: AdSkipped!");
+          console.log("SNPlayer: AdSkipped!");
           document.getElementById("target").innerHTML = "";
-        }, window.RetailSpot.VPAID_EVENTS.AdSkipped);
+        }, window.Screenova.VPAID_EVENTS.AdSkipped);
 
         creative.subscribe(function (message) {
-          console.log("RSPlayer: AdStopped!");
-        }, window.RetailSpot.VPAID_EVENTS.AdStopped);
+          console.log("SNPlayer: AdStopped!");
+        }, window.Screenova.VPAID_EVENTS.AdStopped);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoStart!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoStart);
+          console.log("SNPlayer: AdVideoStart!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoStart);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoFirstQuartile!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoFirstQuartile);
+          console.log("SNPlayer: AdVideoFirstQuartile!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoFirstQuartile);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoMidpoint!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoMidpoint);
+          console.log("SNPlayer: AdVideoMidpoint!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoMidpoint);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoThirdQuartile!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoThirdQuartile);
+          console.log("SNPlayer: AdVideoThirdQuartile!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoThirdQuartile);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoComplete!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoComplete);
+          console.log("SNPlayer: AdVideoComplete!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoComplete);
       });
     }
 
@@ -295,9 +297,9 @@
     document.getElementById("apikey").value = apikey;
 
     var s = document.createElement("script");
-    s.src = "https://static-preprod.retailspotads.com/rsplayer.js";
+    s.src = "https://static-preprod.screenova.cloud/snplayer.js";
     s.onload = function () {
-      document.getElementById("rsp-version").innerText = window.RetailSpot.version;
+      document.getElementById("snp-version").innerText = window.Screenova.version;
     }
     document.body.appendChild(s);
 

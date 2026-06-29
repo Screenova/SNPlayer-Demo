@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RetailSpot sample player</title>
+  <title>Screenova sample player</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background-color: #e6f6fe;
+      background-color: #5a95a2;
     }
 
     #header {
@@ -75,14 +75,16 @@
       border: 1px solid #ddd;
     }
   </style>
-  <script type="text/javascript" src="https://static.retailspotads.com/rsplayer.js"></script>
+  <script type="text/javascript" src="https://static.screenova.cloud/snplayer.js"></script>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
 
   <div id="header">
     <img id="logo"
-      src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+      src="https://screenova.cloud/logo.png"
       alt="Logo">
     <h1>Oustream video/carousel in Monna widget </h1>
   </div>
@@ -92,10 +94,10 @@
   </div>
   <div>
     <div class="instructions">
-      Add the RetailSpot player in your page using this code.
+      Add the Screenova player in your page using this code.
       <br />
       You can find the full library documentation for outstream formats <a
-      target="_blank"  
+      target="_blank"
       href="https://docs.google.com/document/d/1JPHoLcVe7XOfpcZW1edK3T00vl6QKOK7-tKIBJVs0mo/edit?rm=demo">Here</a>
     </div>
     <div class="code-container">
@@ -107,12 +109,12 @@
  (function () {
   const targetElement = document.currentScript.parentNode;
   const s = document.createElement(&quot;script&quot;);
-  s.src = &quot;https://static.retailspotads.com/rsplayer.js&quot;;
+  s.src = &quot;https://static.screenova.cloud/snplayer.js&quot;;
   s.onload = function () {
-   const RS = window.RetailSpot;
-   
-   const RetailSpotConfig = {
-      placement: &quot;68c04b493a9a482fc8053470&quot;,
+   const SN = window.Screenova;
+
+   const ScreenovaConfig = {
+      placement: &quot;6a3a43656ad3c657d3f8cc33&quot;,
       positionSelector: &quot;#target&quot;,
       itemsMinSize: 200,
       autoroll: 4000,
@@ -125,12 +127,12 @@
       secondaryColor: &quot;#f9c863&quot;,
       widget: &quot;monna&quot;,
     };
-  
-   RS.init(RetailSpotConfig, (ad) =&gt; {
+
+   SN.init(ScreenovaConfig, (ad) =&gt; {
     if (ad &amp;&amp; ad.subscribe){
       ad.subscribe(() =&gt; {
         console.log("AdError event received");
-      }, RS.VPAID_EVENTS.AdError); 
+      }, SN.VPAID_EVENTS.AdError);
     }
    });
   };
@@ -143,7 +145,7 @@
     </div>
 
     <div class="instructions">
-      Monna Carousel PREVIEW placement id : <b>68c04b493a9a482fc8053470</b><br />
+      Monna Carousel PREVIEW placement id : <b>6a3a43656ad3c657d3f8cc33</b><br />
     </div>
   </div>
   <div>
@@ -160,8 +162,8 @@
       });
     }
 
-    const RetailSpotConfig = {
-      placement: '68c04b493a9a482fc8053470',
+    const ScreenovaConfig = {
+      placement: '6a3a43656ad3c657d3f8cc33',
       positionSelector: "#target",
       itemsMinSize: 200,
       autoroll: 4000,
@@ -175,16 +177,16 @@
       widget: "monna",
     }
 
-    window.RetailSpot.init(RetailSpotConfig, function (creative) {
+    window.Screenova.init(ScreenovaConfig, function (creative) {
       creative.subscribe(function () {
-        console.log("RSPlayer: AdLoaded!");
-      }, window.RetailSpot.VPAID_EVENTS.AdLoaded);
+        console.log("SNPlayer: AdLoaded!");
+      }, window.Screenova.VPAID_EVENTS.AdLoaded);
       creative.subscribe(function () {
-        console.log("RSPlayer: AdStopped!");
-      }, window.RetailSpot.VPAID_EVENTS.AdStopped);
+        console.log("SNPlayer: AdStopped!");
+      }, window.Screenova.VPAID_EVENTS.AdStopped);
       creative.subscribe(function () {
-        console.log("RSPlayer: Skip button clicked!");
-      }, window.RetailSpot.VPAID_EVENTS.AdSkipped);
+        console.log("SNPlayer: Skip button clicked!");
+      }, window.Screenova.VPAID_EVENTS.AdSkipped);
     });
   </script>
 

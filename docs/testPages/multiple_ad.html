@@ -2,7 +2,7 @@
 <html>
     <head>
     	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>RetailSpot test page</title>
+      <title>Screenova test page</title>
       <style type="text/css">
       	.fake-text {
       		color:gray;
@@ -22,29 +22,31 @@
       </style>
 			<script src="//acdn.adnxs.com/cmp/cmp.complete.bundle.js" async></script>
 
-    </head>
+      <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
+</head>
     <body oncontextmenu="return false;">
-        <h1>RetailSpot player test page</h1>
+        <h1>Screenova player test page</h1>
         <div>
         	Test config:
         	<ul>
-        		<li>RSPlayer version: <b><span id="rsp-version"></span></b></li>
-        		
+				<li>SNPlayer version: <b><span id="snp-version"></span></b></li>
+
         	</ul>
         </div>
         <div>
 					<div class="setting">
 						<b>Environment:</b>
 						<select id="endpoint" disabled>
-							<option value="http://localhost:3000/dist/rsplayer.js"">DEV (localhost:3000/dist/rsplayer.js)</option>
-							<option value="https://not.yet.com"">PROD</option>
+							<option value="http://localhost:3000/dist/snplayer.js">DEV (localhost:3000/dist/snplayer.js)</option>
+							<option value="https://static.screenova.cloud/snplayer.js">PROD</option>
 						</select>
 						<br/>
-						<input type="checkbox" id="rsp_debug" checked disabled/>
-						<label for="rsp_debug">Debug log</label>
+						<input type="checkbox" id="snp_debug" checked disabled/>
+						<label for="snp_debug">Debug log</label>
 					</div>
 					<div class="setting">
-         		<b>Format:</b>	
+							<b>Format:</b>
 						<select id="format-select">
 							<option value="slider">Slider</option>
 							<option value="intext">InText</option>
@@ -92,7 +94,7 @@
 
 
 
-       
+
 				<script type="text/javascript">
 
 					function findGetParameter(parameterName) {
@@ -112,7 +114,7 @@
 							var result = null;
 							for(key in array){
 									if(array[key] == value) result = key;
-							} 
+							}
 
 							return result || defaultValue;
 					}
@@ -123,24 +125,24 @@
 							if(indexOfQueryStr !== -1) {
 									currentUrl = currentUrl.substr(0, indexOfQueryStr);
 							}
-							
+
 							var targetFormat = document.getElementById("format-select").value;
 							var endpoint = document.getElementById("endpoint").value;
 							var vastUrl = document.getElementById("vastUrl").value;
 
 							document.location.href = currentUrl+"?format="+targetFormat
 								+"&env="+endpoint
-								+"&RSPLAYER_LOG=DEBUG"
+								+"&snp_debug=true"
 								+"&vastUrl="+encodeURIComponent(vastUrl)
 					}
 
 					var adformat = findGetParameter("format") || "slider";
 					document.getElementById("format-select").value = adformat;
 
-					var endpoint = findGetParameter("env") || "http://localhost:3000/dist/rsplayer.js";
+					var endpoint = findGetParameter("env") || "https://static.screenova.cloud/snplayer.js";
 
 					var vastUrl = findGetParameter("vastUrl") || "https://ads.stickyadstv.com/vast/vpaid-adapter/2003";
-					
+
 					document.getElementById("vastUrl").value = vastUrl;
 					document.getElementById("vastUrlSelect").value = vastUrl;
 
@@ -148,11 +150,11 @@
 					var s = document.createElement("script");
 					s.src = endpoint;
 					s.onload = function(){
-						const RS = window.RetailSpot;
+						const SN = window.Screenova;
 
-						document.getElementById("rsp-version").innerText = RS.version;
+						document.getElementById("snp-version").innerText = SN.version;
 
-						const RetailSpotConfig = [{
+						const ScreenovaConfig = [{
 								vastUrl:"http://localhost:3000/docs/vast/vpaid.xml",
 								width: 320,
 								height: 180,
@@ -174,10 +176,10 @@
 							},
 						]
 
-						RS.init(RetailSpotConfig, function(creative) {
+						SN.init(ScreenovaConfig, function(creative) {
 							creative.subscribe(function(){
-								console.log("RSPlayer: AdLoaded!");
-							}, RS.VPAID_EVENTS.AdLoaded);
+								console.log("SNPlayer: AdLoaded!");
+							}, SN.VPAID_EVENTS.AdLoaded);
 						});
 					}
 					document.body.appendChild(s);

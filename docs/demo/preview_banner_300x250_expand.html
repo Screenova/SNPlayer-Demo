@@ -3,13 +3,13 @@
 
 <head>
   <meta name="viewport" content="width=device-width" />
-  <title>RetailSpot Preview</title>
+  <title>Screenova Preview</title>
   <style>
     body {
       margin: 0px;
       padding: 0px;
       font-family: Arial, sans-serif;
-      background-color: #e6f6fe;
+      background-color: #5a95a2;
     }
 
     #header {
@@ -71,13 +71,15 @@
       border: 1px solid #ddd;
     }
   </style>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
 
   <div id="header">
     <img id="logo"
-      src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+      src="https://screenova.cloud/logo.png"
       alt="Logo">
     <h1>PREVIEW format banner  300x250 <br />Samsung with expand</h1>
   </div>
@@ -98,11 +100,11 @@
               (function () {
                 const targetElement = document.currentScript.parentNode;
                 const s = document.createElement("script");
-                s.src = "https://static.retailspotads.com/rsplayer.js";
+                s.src = "https://static.screenova.cloud/snplayer.js";
                 s.onload = function () {
-                  const RS = window.RetailSpot;
-                  const RetailSpotConfig = {
-                    placement: "68d3fb9c8810d9660b51c90f",
+                  const SN = window.Screenova;
+                  const ScreenovaConfig = {
+                    placement: "6a3a43656ad3c657d3f8cc33",
                     target: targetElement,
                     width: 300,
                     height: 250,
@@ -116,12 +118,12 @@
                     }
                   };
 
-                  RS.init(RetailSpotConfig, (ad) => {
+                  SN.init(ScreenovaConfig, (ad) => {
                     if (ad && ad.subscribe) {
-                      ad.subscribe(() => RS.tools.track("%%CLICK_URL_UNESC%%"), RS.VPAID_EVENTS.AdClickThru);
+                      ad.subscribe(() => SN.tools.track("%%CLICK_URL_UNESC%%"), SN.VPAID_EVENTS.AdClickThru);
                       ad.subscribe(() => {
-                        RS.tools.GAMNoAdCallback("%%PATTERN:slotCode%%", { origine: "RetailSpot"});
-                      }, RS.VPAID_EVENTS.AdError);
+                        SN.tools.GAMNoAdCallback("%%PATTERN:slotCode%%", { origine: "Screenova"});
+                      }, SN.VPAID_EVENTS.AdError);
                     }
                   });
                 };
@@ -138,13 +140,13 @@
   <div style="flex: 1;">
 
     <div class="instructions">
-      PREVIEW placement id : <b>68d3fb9c8810d9660b51c90f</b><br />
+      PREVIEW placement id : <b>6a3a43656ad3c657d3f8cc33</b><br />
     </div>
     <div class="instructions">
-      Add the RetailSpot player in your page using this code.
+      Add the Screenova player in your page using this code.
       <br />
       You can find the full library documentation for outstream formats <a
-      target="_blank"  
+      target="_blank"
       href="https://docs.google.com/document/d/1JPHoLcVe7XOfpcZW1edK3T00vl6QKOK7-tKIBJVs0mo/edit?rm=demo">Here</a>
     </div>
     <div class="code-container">
@@ -155,30 +157,30 @@
   (function () {
     const targetElement = document.currentScript.parentNode;
     const s = document.createElement(&quot;script&quot;);
-    s.src = &quot;https://static.retailspotads.com/rsplayer.js&quot;;
+    s.src = &quot;https://static.screenova.cloud/snplayer.js&quot;;
     s.onload = function () {
-      const RS = window.RetailSpot;
-      const RetailSpotConfig = {
-        placement: &quot;68d3fb9c8810d9660b51c90f&quot;,
+      const SN = window.Screenova;
+      const ScreenovaConfig = {
+        placement: &quot;6a3a43656ad3c657d3f8cc33&quot;,
         target: targetElement,
         width: 300,
         height: 250,
         videoLoop: true,
         videoFit: &quot;cover&quot;,
         expandVideo: {
-          width: 672, 
+          width: 672,
           height: 378,
           trigger: &quot;view&quot;,
           align: &quot;top-right&quot;,
         }
       };
 
-      RS.init(RetailSpotConfig, (ad) =&gt; {
+      SN.init(ScreenovaConfig, (ad) =&gt; {
         if (ad &amp;&amp; ad.subscribe) {
-          ad.subscribe(() =&gt; RS.tools.track(&quot;%%CLICK_URL_UNESC%%&quot;), RS.VPAID_EVENTS.AdClickThru);
+          ad.subscribe(() =&gt; SN.tools.track(&quot;%%CLICK_URL_UNESC%%&quot;), SN.VPAID_EVENTS.AdClickThru);
           ad.subscribe(() =&gt; {
-            RS.tools.GAMNoAdCallback(&quot;%%PATTERN:slotCode%%&quot;, { origine: &quot;RetailSpot&quot;});
-          }, RS.VPAID_EVENTS.AdError);
+            SN.tools.GAMNoAdCallback(&quot;%%PATTERN:slotCode%%&quot;, { origine: &quot;Screenova&quot;});
+          }, SN.VPAID_EVENTS.AdError);
         }
       });
     };

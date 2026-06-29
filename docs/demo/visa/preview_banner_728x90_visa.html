@@ -3,13 +3,13 @@
 
 <head>
 	<meta name="viewport" content="width=device-width" />
-	<title>RetailSpot Orange Preview</title>
+	<title>Screenova Orange Preview</title>
 	<style>
 		body {
 			margin: 0px;
 			padding: 0px;
 			font-family: Arial, sans-serif;
-			background-color: #e6f6fe;
+			background-color: #5a95a2;
 		}
 
 		#header {
@@ -68,13 +68,15 @@
 			border: 1px solid #ddd;
 		}
 	</style>
+  <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
 </head>
 
 <body>
 
 	<div id="header">
 		<img id="logo"
-			src="https://static.wixstatic.com/media/0b66d2_b422a51179a24f71a843a1db74978d2b~mv2.png/v1/fill/w_268,h_151,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/unknown-8962.png"
+			src="https://screenova.cloud/logo.png"
 			alt="Logo">
 		<h1>PREVIEW format banner 728x90 Orange - Visa</h1>
 	</div>
@@ -85,25 +87,25 @@
 					(function () {
 						const targetElement = document.currentScript.parentNode;
 						const s = document.createElement("script");
-						s.src = "https://static-preprod.retailspotads.com/rsplayer.js";
+						s.src = "https://static-preprod.screenova.cloud/snplayer.js";
 						s.onload = function () {
-							const RS = window.RetailSpot;
-							const RetailSpotConfig = {
-								placement: "eq-testnative-2011248-135707",
+							const SN = window.Screenova;
+							const ScreenovaConfig = {
+								placement: "6a313c955244dec81823bde9",
 								target: targetElement,
 								width: '100%',
 								height: 90,
 								mediatype: "native",
 							};
-						
-							RS.init(RetailSpotConfig, (ad) => {
+
+							SN.init(ScreenovaConfig, (ad) => {
 								if (ad && ad.subscribe){
-									ad.subscribe(() => RS.tools.track("%%CLICK_URL_UNESC%%"), RS.VPAID_EVENTS.AdClickThru);
+									ad.subscribe(() => SN.tools.track("%%CLICK_URL_UNESC%%"), SN.VPAID_EVENTS.AdClickThru);
 									ad.subscribe(() => {
 										if(window.top.coreAds){
-											window.top.coreAds.refreshDisplaySlot("%%PATTERN:slotCode%%", { origine: "RetailSpot"});
+											window.top.coreAds.refreshDisplaySlot("%%PATTERN:slotCode%%", { origine: "Screenova"});
 										}
-									}, RS.VPAID_EVENTS.AdError);	
+									}, SN.VPAID_EVENTS.AdError);
 								}
 							});
 						};
@@ -114,10 +116,10 @@
 		</div>
 		<div>
 			<div class="instructions">
-				Add the RetailSpot player in your page using this code.
+				Add the Screenova player in your page using this code.
 				<br />
 				You can find the full library documentation for outstream formats <a
-				target="_blank"	
+				target="_blank"
 				href="https://docs.google.com/document/d/1JPHoLcVe7XOfpcZW1edK3T00vl6QKOK7-tKIBJVs0mo/edit?rm=demo">Here</a>
 			</div>
 			<div class="code-container">
@@ -128,12 +130,12 @@
   (function () {
 		const targetElement = document.currentScript.parentNode;
 		const s = document.createElement(&quot;script&quot;);
-		s.src = &quot;https://static.retailspotads.com/rsplayer.js&quot;;
+		s.src = &quot;https://static.screenova.cloud/snplayer.js&quot;;
 		s.onload = function () {
-			const RS = window.RetailSpot;
-			
-			const RetailSpotConfig = {
-				placement: &quot;eq-609785-2011248-141761&quot;,
+			const SN = window.Screenova;
+
+			const ScreenovaConfig = {
+				placement: &quot;6a3a43656ad3c657d3f8cc33&quot;,
 				target: targetElement,
 				width: '100%',
 				height: 250,
@@ -142,14 +144,14 @@
 				itemsMinSize: 200,
 			};
 
-			RS.init(RetailSpotConfig, (ad) => {
+			SN.init(ScreenovaConfig, (ad) => {
 				if (ad && ad.subscribe){
-					ad.subscribe(() => RS.tools.track(&quot;%%CLICK_URL_UNESC%%&quot;), RS.VPAID_EVENTS.AdClickThru);
+					ad.subscribe(() => SN.tools.track(&quot;%%CLICK_URL_UNESC%%&quot;), SN.VPAID_EVENTS.AdClickThru);
 					ad.subscribe(() => {
 						if(window.top.coreAds){
-							window.top.coreAds.refreshDisplaySlot(&quot;%%PATTERN:slotCode%%&quot;, { origine: &quot;RetailSpot&quot;});
+							window.top.coreAds.refreshDisplaySlot(&quot;%%PATTERN:slotCode%%&quot;, { origine: &quot;Screenova&quot;});
 						}
-					}, RS.VPAID_EVENTS.AdError);	
+					}, SN.VPAID_EVENTS.AdError);
 				}
 			});
 		};
@@ -162,7 +164,7 @@
 		</div>
 
 		<div class="instructions">
-			Orange SidebySide PREVIEW placement id : <b>eq-609785-2011248-141761</b><br />
+			Orange SidebySide PREVIEW placement id : <b>6a3a43656ad3c657d3f8cc33</b><br />
 		</div>
 	</div>
 	<div>

@@ -4,7 +4,7 @@ Result
 <html>
 
     <head>
-        <link rel="icon" type="image/png" href="/favicon.png">
+        <link rel="icon" type="image/png" href="https://screenova.cloud/logo.png">
         <script async src="//www.googletagservices.com/tag/js/gpt.js"></script>
         <script async src="prebid.js"></script>
         <script>
@@ -12,7 +12,7 @@ Result
                 window.location.search.toLowerCase()
             );
             let env = urlParams.get("env") || "prod";
-            let placement = urlParams.get("placement") || "test-1234";
+            let placement = urlParams.get("placement") || "6a3a43656ad3c657d3f8cc33";
             var div_1_sizes = [
                 [300, 250],
                 [300, 600]
@@ -50,7 +50,7 @@ Result
                     bids: [{
                         bidder: 'retailspot',
                         params: {
-                            placement: "test-123456",
+                            placement: placement,
                             env: env
                         }
                     }]
@@ -103,7 +103,9 @@ Result
 
         </script>
 
-    </head>
+      <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
+</head>
 
     <body>
         <h2>Basic Prebid.js Example</h2>

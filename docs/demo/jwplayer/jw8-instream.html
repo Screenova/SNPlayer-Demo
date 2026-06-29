@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link id="favicon" rel="shortcut icon" href="https://files.readme.io/30bb71e-10a8bad-favicon.ico" type="image/x-icon"
-    class="badge-init" data-href="https://files.readme.io/30bb71e-10a8bad-favicon.ico">
+  <link id="favicon" rel="shortcut icon" href="https://screenova.cloud/logo.png" type="image/png"
+    class="badge-init" data-href="https://screenova.cloud/logo.png">
   <title>JW8 Test page</title>
   <script src='./lib/jw-8.24.3/jwplayer.js'></script>
   <style>
@@ -79,22 +79,24 @@
 
     .button.selected {
       color: white;
-      background-color: #3498db;
+      background-color: #5a95a2;
       border: 1px solid white;
     }
 
-    #rsp-version {
+    #snp-version {
       color: white;
     }
   </style>
+  <link rel="stylesheet" href="../../screenova-theme.css">
+  <script defer src="../../screenova-theme.js"></script>
 </head>
 
 <body>
   <div class="container">
-    <h1 id="title">RetailSpot JW Plugin</h1>
+    <h1 id="title">Screenova JW Plugin</h1>
     <div class="settings">
       <div class="settings-section">
-        RSPlayer version : <span id="version"></span>
+        SNPlayer version : <span id="version"></span>
       </div>
       <div class="settings-section">
         <div class="button" id="preroll">Preroll</div>
@@ -173,7 +175,7 @@
 
       var mediatype = document.getElementById("mediatype").value;
 
-      document.location.href = currentUrl + "?rsp_debug=false"
+      document.location.href = currentUrl + "?snp_debug=false"
         + "&preroll=" + enablePreroll
         + "&midroll=" + enableMidroll
         + "&postroll=" + enablePostroll
@@ -210,18 +212,18 @@
 
 
 
-    // document.getElementById("rsp-version").innerText = RS.version;
+    // document.getElementById("snp-version").innerText = SN.version;
 
-    const nativeTemplateNativeOnly = '<div class="rs-expand" style="overflow:hidden;width:100%;color:#434748;height:100%;max-height:68px;transition:max-height .7s ease;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;box-shadow:rgba(0,0,0,.7) 0 0 20px;border-radius:8px"><div style="display:flex;flex-direction:row;height:68px"><img class="rs-hideonexpand rs-el-img" style="opacity:1;transition:opacity 0.7s ease;width:0px;height:68px;object-fit:contain" src="https://retailspot.github.io/RSPlayer-Demo/images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img class="rs-el-brandlogo" src="" style="width:140px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="rs-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="rs-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><img class="rs-el-cartlogo" src="" style="padding:0 4px 0 0;width:48px;padding:4px;height:48px"></div></div><div style="display:flex;flex-direction:row;flew-grow:1;align-items:center;padding-left:10px;margin-top:14px;"><img class="rs-el-img" style="width:50%;object-fit:contain;" src="https://retailspot.github.io/RSPlayer-Demo/images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"> <img style="width:50%;height:calc(100% - 30px);object-fit:contain" class="rs-el-qrcode" src=""></div></div>';
+    const nativeTemplateNativeOnly = '<div class="sn-expand" style="overflow:hidden;width:100%;color:#434748;height:100%;max-height:68px;transition:max-height .7s ease;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;box-shadow:rgba(0,0,0,.7) 0 0 20px;border-radius:8px"><div style="display:flex;flex-direction:row;height:68px"><img class="sn-hideonexpand sn-el-img" style="opacity:1;transition:opacity 0.7s ease;width:0px;height:68px;object-fit:contain" src="../../images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img class="sn-el-brandlogo" src="" style="width:140px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="sn-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="sn-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><img class="sn-el-cartlogo" src="" style="padding:0 4px 0 0;width:48px;padding:4px;height:48px"></div></div><div style="display:flex;flex-direction:row;flew-grow:1;align-items:center;padding-left:10px;margin-top:14px;"><img class="sn-el-img" style="width:50%;object-fit:contain;" src="../../images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"> <img style="width:50%;height:calc(100% - 30px);object-fit:contain" class="sn-el-qrcode" src=""></div></div>';
 
-    const nativeTemplateCarousel = '<div style="overflow:hidden;width:100%;color:#434748;height:100%;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;"><div style="display:flex;flex-direction:row;height:68px"><img class="rs-el-img" style="opacity:1;transition:opacity 0.7s ease;width:68px;height:68px;object-fit:contain" src="https://retailspot.github.io/RSPlayer-Demo/images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img class="rs-el-brandlogo" src="" style="width:140px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="rs-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="rs-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><div class="rs-el-closebutton" style="padding: 0px 8px; font-size: 20px; background: rgba(0, 0, 0, 0); border-radius: 0px 10px 10px 0px; transition: all 0.3s ease 0s; display: flex; flex-direction: column; justify-content: center; opacity: 1;"><span style="align-items: center; display: flex; height: 20px; justify-content: center; width: 20px;">×</span></div></div></div></div>';
-
-
-    const bannerADM = '<!DOCTYPE html><html><head><title>LightInTheBox</title></head><body style="margin:0"><img src="https://retailspot.github.io/RSPlayer-Demo/resources/banner/banner_300_250_lightinthebox.webp" style="width:300px;height:250px;object-fit:cover" alt="bannière light in the box"></body></html>';
-    const bannerADM2 = '<!DOCTYPE html><html><head><title>kingjouet</title></head><body style="margin:0"><img src="https://retailspot.github.io/RSPlayer-Demo/resources/banner/banner_320_100_kingjouet.png" style="width:320px;height:100px;object-fit:cover" alt="bannière king jouet"></body></html>';
+    const nativeTemplateCarousel = '<div style="overflow:hidden;width:100%;color:#434748;height:100%;display:flex;flex-direction:column;justify-content:flex-start;background:#fff;"><div style="display:flex;flex-direction:row;height:68px"><img class="sn-el-img" style="opacity:1;transition:opacity 0.7s ease;width:68px;height:68px;object-fit:contain" src="../../images/Smartphone-Samsung-Galaxy-Z-Flip4-6-7-Nano-SIM-5G-128-Go-Or-Rose.jpg"><div style="display:flex;flex-direction:column;align-items:center;height:100%;flex-grow:1;justify-content:center"><img class="sn-el-brandlogo" src="" style="width:140px;height:30px;object-fit:cover"><div style="width:100%;height:30px;display:flex;flex-direction:row;justify-content:space-between;align-items:center"><div class="sn-el-title" style="height:16px;flex-grow:1;font-size:14px;">Galaxy Z Flip 5G</div><div class="sn-el-price" style="height:16px;font-weight:600;font-size:14px">999 €</div></div></div><div style="height:calc(100% - 16px);padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:space-around"><div class="sn-el-closebutton" style="padding: 0px 8px; font-size: 20px; background: rgba(0, 0, 0, 0); border-radius: 0px 10px 10px 0px; transition: all 0.3s ease 0s; display: flex; flex-direction: column; justify-content: center; opacity: 1;"><span style="align-items: center; display: flex; height: 20px; justify-content: center; width: 20px;">×</span></div></div></div></div>';
 
 
-    const RetailSpotConfig = {
+    const bannerADM = '<!DOCTYPE html><html><head><title>LightInTheBox</title></head><body style="margin:0"><img src="../../resources/banner/banner_300_250_lightinthebox.webp" style="width:300px;height:250px;object-fit:cover" alt="bannière light in the box"></body></html>';
+    const bannerADM2 = '<!DOCTYPE html><html><head><title>kingjouet</title></head><body style="margin:0"><img src="../../resources/banner/banner_320_100_kingjouet.png" style="width:320px;height:100px;object-fit:cover" alt="bannière king jouet"></body></html>';
+
+
+    const ScreenovaConfig = {
       videoElement: document.getElementById("video-target"),
       positionSelector: "#video-container",
       partnerId: "349693",
@@ -230,42 +232,42 @@
 
 
     if (enablePreroll) {
-      RetailSpotConfig.preroll = {
-        placement: "eq-609785-1856964-125119",
+      ScreenovaConfig.preroll = {
+        placement: "6a3a43656ad3c657d3f8cc33",
       }
       addMessage("Preroll is shown before the content.");
     }
     if (enableMidroll) {
-      RetailSpotConfig.midroll = [
+      ScreenovaConfig.midroll = [
         {
           startTime: "00:00:10",
           startInterval: "00:01:00",
-          placement: "eq-609785-1856964-125119",
+          placement: "6a3a43656ad3c657d3f8cc33",
           skipMiniature: true,
           skipMessage: 'Retour au contenu',
         },
         {
           startTime: "50%",
-          placement: "eq-609785-1856964-125119",
+          placement: "6a3a43656ad3c657d3f8cc33",
         },
         {
           startTime: "-00:00:30",
-          placement: "eq-609785-1856964-125119",
+          placement: "6a3a43656ad3c657d3f8cc33",
         }];
 
       addMessage("Several Midroll shown at : 10s,  50% and 30sec before the end of the content.");
     }
     if (enablePostroll) {
-      RetailSpotConfig.postroll = {
-        placement: "eq-609785-1856964-125119",
+      ScreenovaConfig.postroll = {
+        placement: "6a3a43656ad3c657d3f8cc33",
       }
 
       addMessage("Postroll is shown after the content.");
     }
     if (enablePauseAd) {
       if (mediatype === 'video') {
-        RetailSpotConfig.pauseroll = {
-          placement: "eq-609785-1856964-125119",
+        ScreenovaConfig.pauseroll = {
+          placement: "6a3a43656ad3c657d3f8cc33",
           // format: "slider",
           // videoFit: "cover",
           // borderRadius: '8px'
@@ -279,8 +281,8 @@
 
         addMessage("Pauseroll is showing a video ad on pause.");
       } if (mediatype === 'videonative') {
-        RetailSpotConfig.pauseroll = {
-          placement: "eq-609785-1856964-125119",
+        ScreenovaConfig.pauseroll = {
+          placement: "6a3a43656ad3c657d3f8cc33",
           width: 400,
           height: 300,
           format: "slider",
@@ -298,8 +300,8 @@
         addMessage("Pauseroll is showing a video & Native ad on pause.");
       }
       else if (mediatype === 'native') {
-        RetailSpotConfig.pauseroll = {
-          placement: "eq-609785-1856964-127877",
+        ScreenovaConfig.pauseroll = {
+          placement: "6a3a43656ad3c657d3f8cc33",
           format: "slider",
           mediatype: "native",
           width: 300,
@@ -312,7 +314,7 @@
         addMessage("Pauseroll is showing a Native ad on pause.");
       }
       else if (mediatype === 'carousel') {
-        RetailSpotConfig.pauseroll = {
+        ScreenovaConfig.pauseroll = {
           multiAd: 'slider-carousel',
           itemWidth: 333,
           itemHeight: 68,
@@ -320,17 +322,17 @@
           autoroll: false,
           template: nativeTemplateCarousel,
           ads: [{
-            placement: "eq-609785-1856964-127877"
+            placement: "6a3a43656ad3c657d3f8cc33"
           },
           {
-            placement: "eq-609785-1856964-127877"
+            placement: "6a3a43656ad3c657d3f8cc33"
           }]
         }
 
         addMessage("Pauseroll is showing some native ads in a carousel on pause.");
       }
       else if (mediatype === 'banner') {
-        RetailSpotConfig.pauseroll = {
+        ScreenovaConfig.pauseroll = {
           partnerId: '349693',
           ADM: bannerADM,
           width: 300,
@@ -346,11 +348,11 @@
 
     if (enableNonLinearAd) {
       if (mediatype === 'video') {
-        RetailSpotConfig.nonlinear = [
+        ScreenovaConfig.nonlinear = [
           {
             startTime: "-00:00:30",
             maxDuration: 20000,
-            placement: "eq-609785-1856964-125119",
+            placement: "6a3a43656ad3c657d3f8cc33",
             width: '100%',
             height: '100%',
             allowWidth: '100%',
@@ -362,9 +364,9 @@
         addMessage("Nonlinear slot is showing a video ad 30sec before the content ends.");
 
       } if (mediatype === 'videonative') {
-        RetailSpotConfig.nonlinear = {
+        ScreenovaConfig.nonlinear = {
           startTime: "-00:00:30",
-          placement: "eq-609785-1856964-125119",
+          placement: "6a3a43656ad3c657d3f8cc33",
           width: 400,
           height: 300,
           format: "slider",
@@ -375,9 +377,9 @@
 
         addMessage("Nonlinear slot is showing a video & native ad 30sec before the content ends.");
       } else if (mediatype === 'native') {
-        RetailSpotConfig.nonlinear = {
+        ScreenovaConfig.nonlinear = {
           startTime: "00:00:03",
-          placement: "eq-609785-1856964-127877",
+          placement: "6a3a43656ad3c657d3f8cc33",
           format: "slider",
           mediatype: "native",
           width: 350,
@@ -388,7 +390,7 @@
 
         addMessage("Nonlinear slot is showing a native ad at 3sec.");
       } else if (mediatype === 'carousel') {
-        RetailSpotConfig.nonlinear = {
+        ScreenovaConfig.nonlinear = {
           mediatype: 'native',
           startTime: "00:00:03",
           maxDuration: 30000,
@@ -399,16 +401,16 @@
           autoroll: 8000,
           template: nativeTemplateCarousel,
           ads: [{
-            placement: "eq-609785-1856964-127877"
+            placement: "6a3a43656ad3c657d3f8cc33"
           },
           {
-            placement: "eq-609785-1856964-127877"
+            placement: "6a3a43656ad3c657d3f8cc33"
           }]
         }
         addMessage("Nonlinear slot is showing some native ads in a carousel at 3sec.");
       }
       else if (mediatype === 'banner') {
-        RetailSpotConfig.nonlinear = {
+        ScreenovaConfig.nonlinear = {
           mediatype: 'banner',
           startTime: "00:00:03",
           partnerId: '349693',
@@ -424,18 +426,18 @@
     }
 
     const pluginConf = {};
-    pluginConf["//static.retailspotads.com/rsplayer-jwplugin.js"] = RetailSpotConfig;
+    pluginConf["https://static.screenova.cloud/snplayer.js"] = ScreenovaConfig;
 
     // Setup the player
     const player = jwplayer('player').setup({
       width: 780,
       height: 439,
-      file: 'https://retailspot.github.io/RSPlayer-Demo/resources/umbrella.mp4',
+      file: '../../resources/umbrella.mp4',
       plugins: pluginConf
     });
 
     window.setTimeout(() => {
-      const versionText = window.RetailSpot?.version || "Loading error.";
+      const versionText = window.Screenova?.version || "Loading error.";
       document.getElementById("version").innerText = versionText;
     }, 1000);
   </script>

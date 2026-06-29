@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    <link id="favicon" rel="shortcut icon" href="https://files.readme.io/30bb71e-10a8bad-favicon.ico"
-        type="image/x-icon" class="badge-init" data-href="https://files.readme.io/30bb71e-10a8bad-favicon.ico">
+    <link id="favicon" rel="shortcut icon" href="https://screenova.cloud/logo.png"
+        type="image/png" class="badge-init" data-href="https://screenova.cloud/logo.png">
     <script src='../demo/jwplayer/lib/jw-8.24.3/jwplayer.js'></script>
 
     <style type="text/css">
@@ -15,6 +15,8 @@
             margin: 20px;
         }
     </style>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
@@ -60,15 +62,16 @@
         var env = findGetParameter("env") || "prod";
         document.getElementById("env-select").value = env;
 
-        var endpoint = "//static.retailspotads.com/rsplayer-jwplugin.js";
+        var endpoint = "https://static.screenova.cloud/snplayer.js";
         if (findGetParameter("env") === "preprod") {
-            endpoint = "//static-preprod.retailspotads.com/rsplayer-jwplugin.js";
+            endpoint = "https://static-preprod.screenova.cloud/snplayer.js";
         }
+        var placement = env === "preprod" ? "6a313c955244dec81823bde9" : "6a3a43656ad3c657d3f8cc33";
 
         const plugins = [];
         plugins[endpoint] = {
             "pauseroll": {
-                placement: ['eq-673514-2010768-133777', 'eq-673514-2010768-133778'],
+                placement: [placement, placement],
                 partnerId: '533149',
                 format: 'slider',
                 skipMessage: 'Fermer',
@@ -94,7 +97,7 @@
         const player = jwplayer('player').setup({
             width: 580,
             height: 326,
-            file: 'https://retailspot.github.io/RSPlayer-Demo/resources/umbrella.mp4',
+            file: '../resources/umbrella.mp4',
             plugins: plugins
         });
 

@@ -72,11 +72,11 @@
 
     .button.selected {
       color: white;
-      background-color: #3498db;
+      background-color: #5a95a2;
       border: 1px solid white;
     }
 
-    #rsp-version {
+    #snp-version {
       color: white;
     }
 
@@ -84,13 +84,15 @@
       color: white;
     }
   </style>
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body>
-  <h1 id="title">RetailSpot Instream: Slider format with native assets.</h1>
+  <h1 id="title">Screenova Instream: Slider format with native assets.</h1>
   <div class="settings">
     <div class="settings-section">
-      <b>RSPlayer version: <span id="rsp-version"></span></b>
+      <b>SNPlayer version: <span id="snp-version"></span></b>
     </div>
     <p>The following player shows some ads in <b>slider</b> format with native assets. <br /><b>On pause</b> and in a
       <b>non-linear slot</b> at
@@ -100,7 +102,7 @@
 
   <div id="video-container">
     <video controls id="video-target" muted>
-      <source src="https://retailspot.github.io/RSPlayer-Demo/resources/umbrella.mp4" type="video/mp4">
+      <source src="../resources/umbrella.mp4" type="video/mp4">
       Votre navigateur ne prend pas en charge la lecture vidéo.
     </video>
     <div class="fullscreen-button" onclick="toggleFullscreen()"></div>
@@ -133,43 +135,44 @@
     if (env) {
       env = "-" + env;
     }
-    scriptSrc = "https://static" + env + ".retailspotads.com/rsplayer-instream.js";
+    scriptSrc = "https://static" + env + ".screenova.cloud/snplayer.js";
+    var placement = scriptSrc.indexOf("-preprod") !== -1 ? "6a313c955244dec81823bde9" : "6a3a43656ad3c657d3f8cc33";
 
 
     var s = document.createElement("script");
     s.src = scriptSrc;
     s.onload = function () {
 
-      document.getElementById("rsp-version").innerText = window.RetailSpot.version;
+      document.getElementById("snp-version").innerText = window.Screenova.version;
 
 
-      const RetailSpotConfig = {
+      const ScreenovaConfig = {
         videoElement: document.getElementById("video-target"),
         positionSelector: "#video-container",
         // add a native template to display native ad if any present in the VAST
         // the same template will be used for every ad slot below.
-        //template: "<div><div class="rs-el-title"></div> ... </div>",
-        nonlinear: [,
+        //template: "<div><div class="sn-el-title"></div> ... </div>",
+        nonlinear: [
           {
-            placement: "eq-609785-1856964-127825",
+            placement: placement,
             format: "slider",
             // this non linear will be shown after one minute playin
             startTime: "00:01:00",
             templateMargin: 16,
           },
           {
-            placement: "eq-609785-1856964-127825",
+            placement: placement,
             format: "slider",
-            // this non linear will be shown at 50 percent of video content 
+            // this non linear will be shown at 50 percent of video content
             startTime: "50%",
           }, {
-            placement: "eq-609785-1856964-127825",
+            placement: placement,
             format: "slider",
             // non linear during ending
             startTime: "00:07:22",
           }],
         pauseroll: {
-          placement: "eq-609785-1856964-127825",
+          placement: placement,
           format: "slider",
           // wait 1 second before showing the ad on pause
           pauserollDelay: 1000,
@@ -179,30 +182,30 @@
       }
 
 
-      window.RetailSpot.init(RetailSpotConfig, function (creative) {
+      window.Screenova.init(ScreenovaConfig, function (creative) {
         creative.subscribe(function () {
-          console.log("RSPlayer: AdLoaded!");
-        }, window.RetailSpot.VPAID_EVENTS.AdLoaded);
+          console.log("SNPlayer: AdLoaded!");
+        }, window.Screenova.VPAID_EVENTS.AdLoaded);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoStart!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoStart);
+          console.log("SNPlayer: AdVideoStart!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoStart);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoFirstQuartile!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoFirstQuartile);
+          console.log("SNPlayer: AdVideoFirstQuartile!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoFirstQuartile);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoMidpoint!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoMidpoint);
+          console.log("SNPlayer: AdVideoMidpoint!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoMidpoint);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoThirdQuartile!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoThirdQuartile);
+          console.log("SNPlayer: AdVideoThirdQuartile!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoThirdQuartile);
 
         creative.subscribe(function () {
-          console.log("RSPlayer: AdVideoComplete!");
-        }, window.RetailSpot.VPAID_EVENTS.AdVideoComplete);
+          console.log("SNPlayer: AdVideoComplete!");
+        }, window.Screenova.VPAID_EVENTS.AdVideoComplete);
       });
     }
     document.body.appendChild(s);

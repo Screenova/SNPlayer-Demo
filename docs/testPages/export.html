@@ -2,7 +2,7 @@
 <html>
     <head>
     	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>RetailSpot test page</title>
+      <title>Screenova test page</title>
       <style type="text/css">
       	.fake-text {
       		color:gray;
@@ -22,29 +22,31 @@
       </style>
 			<script src="//acdn.adnxs.com/cmp/cmp.complete.bundle.js" async></script>
 
-    </head>
+      <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
+</head>
     <body oncontextmenu="return false;">
-        <h1>RetailSpot player test page</h1>
+        <h1>Screenova player test page</h1>
         <div>
         	Test config:
         	<ul>
-        		<li>RSPlayer version: <b><span id="rsp-version"></span></b></li>
-        		
+				<li>SNPlayer version: <b><span id="snp-version"></span></b></li>
+
         	</ul>
         </div>
         <div>
 					<div class="setting">
 						<b>Environment:</b>
 						<select id="endpoint" disabled>
-							<option value="http://localhost:3000/dist/rsplayer.js"">DEV (localhost:3000/dist/rsplayer.js)</option>
-							<option value="https://not.yet.com"">PROD</option>
+							<option value="http://localhost:3000/dist/snplayer.js">DEV (localhost:3000/dist/snplayer.js)</option>
+							<option value="https://static.screenova.cloud/snplayer.js">PROD</option>
 						</select>
 						<br/>
-						<input type="checkbox" id="rsp_debug" checked disabled/>
-						<label for="rsp_debug">Debug log</label>
+						<input type="checkbox" id="snp_debug" checked disabled/>
+						<label for="snp_debug">Debug log</label>
 					</div>
 					<div class="setting">
-         		<b>Format:</b>	
+							<b>Format:</b>
 						<select id="format-select">
 							<option value="slider">Slider</option>
 							<option value="intext">InText</option>
@@ -89,12 +91,12 @@
         		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quam elementum pulvinar etiam non quam lacus suspendisse faucibus. Sed ullamcorper morbi tincidunt ornare massa. Purus viverra accumsan in nisl nisi scelerisque. Proin sed libero enim sed faucibus turpis in eu. Diam donec adipiscing tristique risus nec feugiat in fermentum posuere. Tempor nec feugiat nisl pretium fusce. Mauris vitae ultricies leo integer malesuada nunc. Rhoncus mattis rhoncus urna neque viverra justo. Sit amet luctus venenatis lectus magna. Eu scelerisque felis imperdiet proin fermentum leo vel. Aliquet eget sit amet tellus cras adipiscing enim eu turpis. Montes nascetur ridiculus mus mauris vitae ultricies leo integer. Tristique senectus et netus et malesuada fames ac turpis egestas. Urna nec tincidunt praesent semper feugiat nibh sed pulvinar proin. Nec feugiat in fermentum posuere urna nec tincidunt praesent semper. Vitae elementum curabitur vitae nunc sed velit. Pretium viverra suspendisse potenti nullam ac tortor. Eu facilisis sed odio morbi quis commodo odio.
         	</p>
         </div>
-      
+
       <script type="text/javascript">
         (function(){
-          window.RetailSpotConfig = {
+          window.ScreenovaConfig = {
             vastUrl: "https://demo-generator.s3.eu-west-3.amazonaws.com/test_vastTag/cartier.xml",
-            placement: "eq-8-560837-1702737-118062",
+            placement: "6a3a43656ad3c657d3f8cc33",
 						//mediatype: "native",
             align: "right",
             //CSSSelector: "#target", // ignored by slider ad format
@@ -110,7 +112,7 @@
 					cs.setAttribute("async", "");
 					cs.onload = function(){
 						var s = document.createElement("script");
-						s.src = "http://localhost:3000/dist/rsplayer.js";
+						s.src = "https://static.screenova.cloud/snplayer.js";
 						s.setAttribute("async", "");
 						document.body.appendChild(s);
 					}

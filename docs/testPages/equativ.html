@@ -3,7 +3,7 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>RetailSpot x Equativ test page</title>
+	<title>Screenova x Equativ test page</title>
 	<style type="text/css">
 		.grid {
 			width: 900px;
@@ -82,14 +82,16 @@
 	</style>
 	<script src="//acdn.adnxs.com/cmp/cmp.complete.bundle.js" async></script>
 
+  <link rel="stylesheet" href="../screenova-theme.css">
+  <script defer src="../screenova-theme.js"></script>
 </head>
 
 <body oncontextmenu="return false;">
-	<h1>RetailSpot x Equativ test page</h1>
+	<h1>Screenova x Equativ test page</h1>
 	<div>
 		Test config:
 		<ul>
-			<li>RSPlayer version: <b><span id="rsp-version"></span></b></li>
+			<li>SNPlayer version: <b><span id="snp-version"></span></b></li>
 
 		</ul>
 	</div>
@@ -97,13 +99,13 @@
 		<div class="setting">
 			<span class="label">Environment:</span>
 			<select id="endpoint">
-				<option value="https://static-preprod.retailspotads.com/rsplayer.js">PREPROD (static-preprod)</option>
-				<option value="https://static.retailspotads.com/rsplayer.js">PROD (static)</option>
-				<option value="http://localhost:3000/dist/rsplayer.js">DEV (localhost:3000/dist/rsplayer.js)</option>
+				<option value="https://static-preprod.screenova.cloud/snplayer.js">PREPROD (static-preprod)</option>
+				<option value="https://static.screenova.cloud/snplayer.js">PROD (static)</option>
+				<option value="http://localhost:3000/dist/snplayer.js">DEV (localhost:3000/dist/snplayer.js)</option>
 			</select>
 			<br />
-			<input type="checkbox" id="rsp_debug" checked disabled />
-			<label for="rsp_debug">Debug log</label>
+			<input type="checkbox" id="snp_debug" checked disabled />
+			<label for="snp_debug">Debug log</label>
 		</div>
 		<div class="setting">
 
@@ -313,14 +315,14 @@
 				+ "&align=" + align
 				+ "&mode=" + mode
 				+ "&env=" + endpoint
-				+ "&rsp_debug=true"
+				+ "&snp_debug=true"
 				+ "&pageId=" + pageId
 				+ "&siteId=" + siteId
 				+ "&formatId=" + formatId
 		}
 
 
-		var endpoint = findGetParameter("env") || "https://static-preprod.retail-spot.io/rsplayer.js";
+		var endpoint = findGetParameter("env") || "https://static-preprod.screenova.cloud/snplayer.js";
 		var size = findGetParameter("size") || "3";
 		var align = findGetParameter("align") || "left";
 		var mode = findGetParameter("mode") || "aside-left";
@@ -336,7 +338,7 @@
 		document.getElementById("pageInput").value = pageId;
 		document.getElementById("formatInput").value = formatId;
 
-		const placementId = "eq-" + siteId + "-" + pageId + "-" + formatId;
+		const placementId = endpoint.indexOf("-preprod") !== -1 ? "6a313c955244dec81823bde9" : "6a3a43656ad3c657d3f8cc33";
 		document.getElementById("constructedId").innerText = placementId;
 
 
@@ -344,11 +346,11 @@
 		var s = document.createElement("script");
 		s.src = endpoint;
 		s.onload = function () {
-			const RS = window.RetailSpot;
+			const SN = window.Screenova;
 
-			document.getElementById("rsp-version").innerText = RS.version;
+			document.getElementById("snp-version").innerText = SN.version;
 
-			const RetailSpotConfig = {
+			const ScreenovaConfig = {
 				placement: placementId,
 				format: "ingrid",
 				align: align,
@@ -356,11 +358,11 @@
 				videoPosition: mode,
 			}
 
-			RS.init(RetailSpotConfig, function (creative) {
+			SN.init(ScreenovaConfig, function (creative) {
 				if (creative && creative.subscribe) {
 					creative.subscribe(function () {
-						console.log("RSPlayer: AdLoaded!");
-					}, RS.VPAID_EVENTS.AdLoaded);
+						console.log("SNPlayer: AdLoaded!");
+					}, SN.VPAID_EVENTS.AdLoaded);
 				}
 				else if (!creative) {
 					console.log("No Ad Creative.")

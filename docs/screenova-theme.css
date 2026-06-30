@@ -215,8 +215,10 @@ body.screenova-doc #player,
 body.screenova-doc #sn-outercontainer,
 body.screenova-doc #snplayer,
 body.screenova-doc [id^="SN-ad-"],
-body.screenova-doc video,
-body.screenova-doc iframe {
+body.screenova-doc #sn-outercontainer video,
+body.screenova-doc #sn-outercontainer iframe,
+body.screenova-doc #snplayer video,
+body.screenova-doc #snplayer iframe {
   border-radius: 0 !important;
   outline: none !important;
   box-shadow: none !important;

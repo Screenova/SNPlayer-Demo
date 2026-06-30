@@ -8,6 +8,7 @@
   --sn-muted: #62767c;
   --sn-border: rgba(45, 82, 90, 0.18);
   --sn-shadow: 0 14px 38px rgba(34, 68, 76, 0.12);
+  --sn-ad-frame-padding: 8px;
 }
 
 html {
@@ -180,21 +181,45 @@ body.screenova-doc .grid-item {
 
 body.screenova-doc #videoContainer,
 body.screenova-doc #video-container,
-body.screenova-doc #player,
 body.screenova-doc #test_ad_div,
 body.screenova-doc .ad-slot,
-body.screenova-doc video,
-body.screenova-doc iframe {
+body.screenova-doc > #target {
   max-width: 100% !important;
+  padding: var(--sn-ad-frame-padding) !important;
   border-radius: 8px !important;
   outline: 1px solid var(--sn-border);
   box-shadow: var(--sn-shadow);
   background: var(--sn-surface);
 }
 
+body.screenova-doc > #target {
+  max-width: none !important;
+}
+
 body.screenova-doc #videoContainer,
-body.screenova-doc #video-container {
-  overflow: hidden;
+body.screenova-doc #video-container,
+body.screenova-doc #test_ad_div,
+body.screenova-doc .ad-slot,
+body.screenova-doc > #target {
+  overflow: visible !important;
+}
+
+body.screenova-doc #videoContainer > #target,
+body.screenova-doc #video-container > #target,
+body.screenova-doc #test_ad_div > #target,
+body.screenova-doc .ad-slot > #target {
+  position: relative !important;
+}
+
+body.screenova-doc #player,
+body.screenova-doc #sn-outercontainer,
+body.screenova-doc #snplayer,
+body.screenova-doc [id^="SN-ad-"],
+body.screenova-doc video,
+body.screenova-doc iframe {
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 body.screenova-doc input,

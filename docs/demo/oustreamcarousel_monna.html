@@ -22,21 +22,22 @@
       max-width: 275px;
     }
 
-    #videoContainer {
-      width: calc(100% - 100px);
-      height: 300px;
-      position: relative;
-      overflow: hidden;
-      background-color: #fbd285;
-      padding: 50px;
-    }
-
     #target {
       position: relative;
-      width: calc(100% - 100px);
+      width: 100vw;
       height: 300px;
-      max-width: 1200px;
-      margin: auto;
+      max-width: none;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      overflow: visible;
+      background-color: #fbd285;
+    }
+
+    body.screenova-doc > #target {
+      width: 100vw !important;
+      max-width: none !important;
+      margin-left: calc(50% - 50vw) !important;
+      margin-right: calc(50% - 50vw) !important;
     }
 
     .instructions {
@@ -89,9 +90,7 @@
     <h1>Oustream video/carousel in Monna widget </h1>
   </div>
 
-  <div id="videoContainer">
-    <div id="target"></div>
-  </div>
+  <div id="target"></div>
   <div>
     <div class="instructions">
       Add the Screenova player in your page using this code.

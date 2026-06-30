@@ -20,8 +20,52 @@
 			font-family: arial;
 		}
 
-		.setting {
-			margin: 20px;
+		.test-config {
+			display: grid;
+			gap: 16px;
+			max-width: 920px;
+			margin: 0 auto 24px;
+			padding: 18px;
+			background: rgba(255, 255, 255, 0.92);
+			border: 1px solid rgba(45, 82, 90, 0.18);
+			border-radius: 8px;
+			box-shadow: 0 14px 38px rgba(34, 68, 76, 0.12);
+		}
+
+		.test-config__version {
+			font-size: 14px;
+			color: #62767c;
+		}
+
+		.test-config__controls {
+			display: grid;
+			grid-template-columns: minmax(140px, 180px) minmax(280px, 1fr) auto;
+			gap: 12px;
+			align-items: end;
+		}
+
+		.test-config__field {
+			display: grid;
+			gap: 6px;
+			min-width: 0;
+			font-size: 13px;
+			font-weight: 700;
+		}
+
+		.test-config__field input,
+		.test-config__field select {
+			width: 100%;
+		}
+
+		body.screenova-doc .test-config__apply {
+			box-shadow: none !important;
+			white-space: nowrap;
+		}
+
+		@media (max-width: 720px) {
+			.test-config__controls {
+				grid-template-columns: 1fr;
+			}
 		}
 	</style>
 	<script src="//acdn.adnxs.com/cmp/cmp.complete.bundle.js" async></script>
@@ -32,27 +76,23 @@
 
 <body oncontextmenu="return false;">
 	<h1>Screenova player test page</h1>
-	<div>
-		Test config:
-		<ul>
-			<li>SNPlayer version: <b><span id="snp-version"></span></b></li>
-
-		</ul>
-	</div>
-	<div>
-		<div class="setting">
-			<b>Format:</b>
-			<select id="format-select">
-				<option value="slider">Slider</option>
-				<option value="intext">InText</option>
-			</select>
+	<div class="test-config">
+		<div class="test-config__version">
+			SNPlayer version: <b><span id="snp-version"></span></b>
 		</div>
-		<div class="setting">
-			<b>Placement Id:</b>
-			<input id="placement" type="text" style="width:100%;" value="6a3a43656ad3c657d3f8cc33" />
-		</div>
-		<div class="setting">
-			<button onclick="changeTest()">APPLY</button>
+		<div class="test-config__controls">
+			<label class="test-config__field" for="format-select">
+				<span>Format</span>
+				<select id="format-select">
+					<option value="slider">Slider</option>
+					<option value="intext">InText</option>
+				</select>
+			</label>
+			<label class="test-config__field" for="placement">
+				<span>Placement Id</span>
+				<input id="placement" type="text" value="6a3a43656ad3c657d3f8cc33" />
+			</label>
+			<button class="test-config__apply" onclick="changeTest()">APPLY</button>
 		</div>
 	</div>
 	<div class="fake-text">

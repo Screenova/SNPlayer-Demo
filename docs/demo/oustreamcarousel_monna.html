@@ -75,7 +75,9 @@
       border: 1px solid #ddd;
     }
   </style>
-  <script type="text/javascript" src="https://static.screenova.cloud/snplayer.js"></script>
+  <script>
+    document.write('<script type="text/javascript" src="https://static.screenova.cloud/snplayer.js?cb=' + Date.now() + '"><\/script>');
+  </script>
   <link rel="stylesheet" href="../screenova-theme.css">
   <script defer src="../screenova-theme.js"></script>
 </head>

@@ -75,9 +75,7 @@
       border: 1px solid #ddd;
     }
   </style>
-  <script>
-    document.write('<script type="text/javascript" src="https://static.screenova.cloud/snplayer.js?cb=' + Date.now() + '"><\/script>');
-  </script>
+
   <link rel="stylesheet" href="../screenova-theme.css">
   <script defer src="../screenova-theme.js"></script>
 </head>
@@ -146,7 +144,6 @@
   </div>
   <div>
   <script>
-
     function copyCode(button) {
       const code = button.nextElementSibling.querySelector("code").innerText;
       navigator.clipboard.writeText(code).then(() => {
@@ -173,17 +170,28 @@
       widget: "monna",
     }
 
-    window.Screenova.init(ScreenovaConfig, function (creative) {
-      creative.subscribe(function () {
-        console.log("SNPlayer: AdLoaded!");
-      }, window.Screenova.VPAID_EVENTS.AdLoaded);
-      creative.subscribe(function () {
-        console.log("SNPlayer: AdStopped!");
-      }, window.Screenova.VPAID_EVENTS.AdStopped);
-      creative.subscribe(function () {
-        console.log("SNPlayer: Skip button clicked!");
-      }, window.Screenova.VPAID_EVENTS.AdSkipped);
-    });
+    function initScreenova() {
+      window.Screenova.init(ScreenovaConfig, function (creative) {
+        creative.subscribe(function () {
+          console.log("SNPlayer: AdLoaded!");
+        }, window.Screenova.VPAID_EVENTS.AdLoaded);
+        creative.subscribe(function () {
+          console.log("SNPlayer: AdStopped!");
+        }, window.Screenova.VPAID_EVENTS.AdStopped);
+        creative.subscribe(function () {
+          console.log("SNPlayer: Skip button clicked!");
+        }, window.Screenova.VPAID_EVENTS.AdSkipped);
+      });
+    }
+
+    const snplayerScript = document.createElement("script");
+    snplayerScript.type = "text/javascript";
+    snplayerScript.src = "https://static.screenova.cloud/snplayer.js?cb=" + Date.now();
+    snplayerScript.onload = initScreenova;
+    snplayerScript.onerror = function () {
+      console.error("SNPlayer script failed to load.");
+    };
+    document.head.appendChild(snplayerScript);
   </script>
 
 </body>

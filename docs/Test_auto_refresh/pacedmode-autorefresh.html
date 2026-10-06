@@ -209,6 +209,7 @@
             <label>Intervalle de refresh</label>
             <select id="intervalSelect">
                 <option value="10">10 secondes</option>
+                <option value="20">20 secondes</option>
                 <option value="30">30 secondes</option>
                 <option value="60">60 secondes (recommandé)</option>
                 <option value="90">90 secondes</option>
@@ -353,8 +354,14 @@ const TEST_PLACEMENTS = {
     prod: '6a3a43656ad3c657d3f8cc33',
     preprod: '6a313c955244dec81823bde9'
 };
+const ALLOWED_INTERVALS = [10, 20, 30, 60, 90, 120, 180, 300];
 function defaultPlacementForEnv(env) {
     return TEST_PLACEMENTS[env] || TEST_PLACEMENTS.preprod;
+}
+function initialInterval() {
+    const urlInterval = parseInt(getParam('interval'), 10);
+    if (ALLOWED_INTERVALS.includes(urlInterval)) return urlInterval;
+    return parseInt(localStorage.getItem('qa_interval'), 10) || 60;
 }
 const initialEnv = localStorage.getItem('qa_env') || 'preprod';
 let state = {
@@ -362,7 +369,7 @@ let state = {
     env:       initialEnv,
     placement: getParam('placement') || localStorage.getItem('qa_placement') || defaultPlacementForEnv(initialEnv),
     format:    getParam('format')    || localStorage.getItem('qa_format')    || 'slider',
-    interval:  parseInt(localStorage.getItem('qa_interval')) || 60,
+    interval:  initialInterval(),
     uninterruptedMode: localStorage.getItem('qa_uninterruptedMode') === 'true',
     imp:       parseInt(localStorage.getItem('qa_imp'))      || 0,
     noad:      parseInt(localStorage.getItem('qa_noad'))     || 0,
@@ -378,6 +385,7 @@ let noimpTimer     = null;
 let snPlayerReady  = false;   // true dès que snplayer.js est chargé dans la page
 let SN             = null;
 let creative       = null;
+let adLoaded       = false;     // true only after the delegated creative emits AdLoaded
 let adInProgress   = false;   // true entre AdStarted et AdStopped
 let waitingForAdStoppedBeforeNextRefresh = false;
 let pendingAttemptId = null;
@@ -407,6 +415,7 @@ window.onload = () => {
     updateStats(); loadHistory(); drawChart();
     if (state.placement) setParam('placement', state.placement);
     if (state.format)    setParam('format',    state.format);
+    setParam('interval', state.interval);
 
     if (state.running) {
         lockControls(true);
@@ -448,6 +457,23 @@ function sendInit() {
     }
 
     if (creative) {
+        // SN.init() returns a loader before the VAST/media pipeline is ready.
+        // If no playable ad has emitted AdLoaded and AdStarted yet, stopAd()
+        // cannot emit AdStopped (VideoPlayer only does so when started=true).
+        // Drop that stale loader and start the next cycle; its late callbacks
+        // are ignored by the snCycleId guard in doSnInit().
+        if (!adLoaded || !adInProgress) {
+            log('warn', 'Loader abandonné avant AdLoaded/AdStarted — nouveau cycle sans stopAd()');
+            creative = null;
+            adLoaded = false;
+            adInProgress = false;
+            pendingAttemptId = null;
+            stopAdPendingForInit = false;
+            activeAttemptId = currentAttemptId;
+            doSnInit();
+            startCycleTimers();
+            return true;
+        }
         if (state.uninterruptedMode) {
             onSnEvent('initQueuedUntilAdStopped', { reason: 'init() reçu avec creative actif', attemptId: currentAttemptId });
             return false;
@@ -468,6 +494,7 @@ function sendInit() {
 }
 
 function doSnInit() {
+    adLoaded = false;
     adInProgress = false;
     creative = null;
 
@@ -500,6 +527,7 @@ function doSnInit() {
 
         creative.subscribe(function() {
             if (myCycleId !== snCycleId) return;
+            adLoaded = true;
             onSnEvent('AdLoaded');
         }, SN.VPAID_EVENTS.AdLoaded);
 
@@ -521,6 +549,7 @@ function doSnInit() {
 
         creative.subscribe(function() {
             if (myCycleId !== snCycleId) return;
+            adLoaded = false;
             adInProgress = false;
             creative = null;
             onSnEvent('AdStopped');
@@ -529,6 +558,7 @@ function doSnInit() {
 
         creative.subscribe(function(err) {
             if (myCycleId !== snCycleId) return;
+            adLoaded = false;
             adInProgress = false;
             creative = null;
             const errData = { err: JSON.stringify(err) };
@@ -796,6 +826,7 @@ function launchCycle() {
 
     cycleImpCount = 0;
     cycleSettled  = false;
+    adLoaded      = false;
     cycleStart    = Date.now();
     nextRefreshScheduled = false;
     waitingForAdStoppedBeforeNextRefresh = false;
@@ -920,6 +951,7 @@ function startTest() {
     localStorage.setItem('qa_imp_history', '[]');
     setParam('placement', state.placement);
     setParam('format',    state.format);
+    setParam('interval', state.interval);
     saveState();
     location.reload();
 }

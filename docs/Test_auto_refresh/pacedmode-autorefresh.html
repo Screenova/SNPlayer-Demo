@@ -464,6 +464,24 @@ function onSnLoaded() {
     onSnEvent('playerReady');
 }
 
+// Remove the previous format container before refreshing the same placement.
+// clearAd() also clears format-specific wrappers; removing only #snplayer would
+// leave the old loader attached to the page and block the default format.
+function clearCreativePlayer(reason) {
+    const staleCreative = creative;
+    if (!staleCreative) return;
+
+    try {
+        if (typeof staleCreative.clearAd === 'function') {
+            staleCreative.clearAd();
+        }
+    } catch (error) {
+        log('warn', 'clearAd() erreur' + (reason ? ' (' + reason + ')' : '') + ': ' + error.message);
+    }
+
+    if (creative === staleCreative) creative = null;
+}
+
 function sendInit() {
     if (!snPlayerReady || !SN) {
         onSnEvent('notReady', { reason: 'SNPlayer pas encore chargé' });
@@ -478,7 +496,7 @@ function sendInit() {
         // are ignored by the snCycleId guard in doSnInit().
         if (!adLoaded || !adInProgress) {
             log('warn', 'Loader abandonné avant AdLoaded/AdStarted — nouveau cycle sans stopAd()');
-            creative = null;
+            clearCreativePlayer('loader abandonné');
             adLoaded = false;
             adInProgress = false;
             pendingAttemptId = null;
@@ -565,18 +583,18 @@ function doSnInit() {
 
         creative.subscribe(function() {
             if (myCycleId !== snCycleId) return;
+            clearCreativePlayer('AdStopped');
             adLoaded = false;
             adInProgress = false;
-            creative = null;
             onSnEvent('AdStopped');
             firePendingInitAfterStop(false);
         }, SN.VPAID_EVENTS.AdStopped);
 
         creative.subscribe(function(err) {
             if (myCycleId !== snCycleId) return;
+            clearCreativePlayer('AdError');
             adLoaded = false;
             adInProgress = false;
-            creative = null;
             const errData = { err: JSON.stringify(err) };
             if (err && err.code) errData.code = err.code;
             if (err && err.status) errData.status = err.status;

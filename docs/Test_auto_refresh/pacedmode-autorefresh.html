@@ -199,6 +199,7 @@
 
             <label>Format</label>
             <select id="formatSelect" onchange="onFormatChange(this.value)">
+                <option value="">Aucun format spécifique</option>
                 <option value="slider">Slider</option>
                 <option value="intext">InText</option>
             </select>
@@ -348,6 +349,11 @@ function setParam(n, v) {
     u.searchParams.set(n, v);
     window.history.replaceState({}, '', u.toString());
 }
+function clearParam(n) {
+    const u = new URL(window.location.href);
+    u.searchParams.delete(n);
+    window.history.replaceState({}, '', u.toString());
+}
 
 //STATE
 const TEST_PLACEMENTS = {
@@ -355,6 +361,13 @@ const TEST_PLACEMENTS = {
     preprod: '6a313c955244dec81823bde9'
 };
 const ALLOWED_INTERVALS = [10, 20, 30, 60, 90, 120, 180, 300];
+function initialFormat() {
+    const urlFormat = getParam('format');
+    if (urlFormat) return urlFormat;
+    const storedFormat = localStorage.getItem('qa_format');
+    // Migrate the old implicit slider default to the standard player format.
+    return storedFormat === 'slider' ? '' : (storedFormat || '');
+}
 function defaultPlacementForEnv(env) {
     return TEST_PLACEMENTS[env] || TEST_PLACEMENTS.preprod;
 }
@@ -368,7 +381,7 @@ let state = {
     running:   localStorage.getItem('qa_running') === 'true',
     env:       initialEnv,
     placement: getParam('placement') || localStorage.getItem('qa_placement') || defaultPlacementForEnv(initialEnv),
-    format:    getParam('format')    || localStorage.getItem('qa_format')    || 'slider',
+    format:    initialFormat(),
     interval:  initialInterval(),
     uninterruptedMode: localStorage.getItem('qa_uninterruptedMode') === 'true',
     imp:       parseInt(localStorage.getItem('qa_imp'))      || 0,
@@ -414,7 +427,8 @@ window.onload = () => {
     updateFormatLabel(state.format);
     updateStats(); loadHistory(); drawChart();
     if (state.placement) setParam('placement', state.placement);
-    if (state.format)    setParam('format',    state.format);
+    if (state.format) setParam('format', state.format);
+    else clearParam('format');
     setParam('interval', state.interval);
 
     if (state.running) {
@@ -501,7 +515,6 @@ function doSnInit() {
     const myCycleId = ++snCycleId;
     const cfg = {
         placement: state.placement,
-        format: state.format,
         positionSelector: '#adPreview',
         width: 580,
         height: 320,
@@ -509,8 +522,11 @@ function doSnInit() {
         allowRefresh: true,
         autoplay: true,
         muted: true,
+        // Keep pacing traffic independent from viewport scrolling in this test page.
+        onHidden: 'none',
         closeButton: false
     };
+    if (state.format) cfg.format = state.format;
 
     onSnEvent('initCalled');
 
@@ -950,7 +966,8 @@ function startTest() {
     localStorage.setItem('qa_cycle_data', '[]');
     localStorage.setItem('qa_imp_history', '[]');
     setParam('placement', state.placement);
-    setParam('format',    state.format);
+    if (state.format) setParam('format', state.format);
+    else clearParam('format');
     setParam('interval', state.interval);
     saveState();
     location.reload();
@@ -989,11 +1006,12 @@ function setEnvUI(env) {
     document.getElementById('btnProd').className    = 'env-btn'+(env==='prod'   ?' active-prod':'');
 }
 function onFormatChange(val) {
-    state.format = val; localStorage.setItem('qa_format', val); setParam('format', val);
+    state.format = val; localStorage.setItem('qa_format', val);
+    if (val) setParam('format', val); else clearParam('format');
     updateFormatLabel(val);
 }
 function updateFormatLabel(val) {
-    document.getElementById('previewFormatLabel').textContent = val.toUpperCase();
+    document.getElementById('previewFormatLabel').textContent = val ? val.toUpperCase() : 'STANDARD';
     // hauteur de la zone de visualisation adaptée selon le format
     const preview = document.getElementById('adPreview');
     if (preview) {

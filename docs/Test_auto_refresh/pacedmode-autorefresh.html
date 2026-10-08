@@ -472,6 +472,16 @@ function clearCreativePlayer(reason) {
     if (!staleCreative) return;
 
     try {
+        // Always stop first: clearAd() only removes the rendered creative and
+        // some VPAID implementations keep playback/listeners alive otherwise.
+        if (typeof staleCreative.stopAd === 'function') {
+            staleCreative.stopAd();
+        }
+    } catch (error) {
+        log('warn', 'stopAd() erreur' + (reason ? ' (' + reason + ')' : '') + ': ' + error.message);
+    }
+
+    try {
         if (typeof staleCreative.clearAd === 'function') {
             staleCreative.clearAd();
         }
@@ -480,6 +490,24 @@ function clearCreativePlayer(reason) {
     }
 
     if (creative === staleCreative) creative = null;
+}
+
+// Invalidate and synchronously tear down the previous cycle before creating a
+// new loader. Late callbacks from the old SN.init() are ignored by snCycleId.
+function abortPreviousCycle(reason) {
+    snCycleId++;
+
+    if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
+    if (noimpTimer) { clearTimeout(noimpTimer); noimpTimer = null; }
+
+    nextRefreshScheduled = false;
+    pendingAttemptId = null;
+    stopAdPendingForInit = false;
+    waitingForAdStoppedBeforeNextRefresh = false;
+    adLoaded = false;
+    adInProgress = false;
+
+    clearCreativePlayer(reason || 'nouveau cycle');
 }
 
 function sendInit() {
@@ -857,6 +885,10 @@ function onSnEvent(type, data) {
 // SN.init() est appelé directement depuis le document courant.
 function launchCycle() {
     if (!state.running) return;
+
+    // A refresh is a hard boundary: never leave the previous loader, player,
+    // timer, or late callback alive while starting the next request.
+    abortPreviousCycle('début du nouveau cycle');
 
     cycleImpCount = 0;
     cycleSettled  = false;
